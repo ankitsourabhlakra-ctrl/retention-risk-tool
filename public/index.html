@@ -164,6 +164,37 @@ td { padding: 11px 14px; vertical-align: middle; }
 .tier-box-desc { font-size: 11px; color: #666; line-height: 1.4; }
 .guide-section-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 14px; }
 .guide-full { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 20px; }
+
+.footer { background: #1a1a2e; color: #aaa; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; margin-top: 40px; }
+.footer-left { line-height: 1.6; }
+.footer-left strong { color: white; }
+.footer-links { display: flex; gap: 16px; }
+.footer-link { color: #aaa; text-decoration: none; display: flex; align-items: center; gap: 5px; }
+.footer-link:hover { color: white; }
+
+/* DEMO BUTTON */
+.demo-btn { width: 100%; padding: 9px; background: transparent; border: 1px dashed #e8c97a; color: #e8c97a; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; margin-bottom: 8px; transition: all 0.15s; }
+.demo-btn:hover { background: rgba(232,201,122,0.08); }
+
+/* GOOGLE SHEET */
+.sheet-card { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 20px; }
+.sheet-card h2 { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 6px; }
+.sheet-card p { font-size: 13px; color: #888; margin-bottom: 16px; line-height: 1.5; }
+.sheet-input-row { display: flex; gap: 10px; margin-bottom: 12px; }
+.sheet-input { flex: 1; padding: 9px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; outline: none; }
+.sheet-input:focus { border-color: #1a1a2e; }
+.sheet-btn { padding: 9px 20px; background: #1a1a2e; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.sheet-btn:hover { background: #2d2d5e; }
+.sheet-btn:disabled { background: #999; cursor: not-allowed; }
+.sheet-steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 16px; }
+.sheet-step { background: #f8f8f8; border-radius: 8px; padding: 14px; }
+.sheet-step-num { font-size: 11px; font-weight: 700; color: #e8c97a; background: #1a1a2e; display: inline-block; width: 20px; height: 20px; border-radius: 50%; text-align: center; line-height: 20px; margin-bottom: 7px; }
+.sheet-step-title { font-size: 12px; font-weight: 600; color: #222; margin-bottom: 3px; }
+.sheet-step-desc { font-size: 11px; color: #888; line-height: 1.4; }
+.sheet-template-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #f0f7ff; border: 1px solid #b3d4f5; border-radius: 6px; font-size: 12px; color: #1a5fb4; text-decoration: none; cursor: pointer; }
+.sheet-template-btn:hover { background: #ddeeff; }
+.sheet-error { background: #fde8e8; color: #c0392b; padding: 10px 14px; border-radius: 6px; font-size: 12px; margin-top: 8px; display: none; }
+.sheet-error.visible { display: block; }
 </style>
 </head>
 <body>
@@ -176,6 +207,7 @@ td { padding: 11px 14px; vertical-align: middle; }
 <div class="tabs">
   <div class="tab active" id="tab-single" onclick="switchTab('single')">Single School</div>
   <div class="tab" id="tab-csv" onclick="switchTab('csv')">Batch Upload (CSV)</div>
+  <div class="tab" id="tab-sheet" onclick="switchTab('sheet')">&#128196; Google Sheet Sync</div>
   <div class="tab" id="tab-guide" onclick="switchTab('guide')">How to Use &amp; Metric Guide</div>
 </div>
 
@@ -285,6 +317,7 @@ td { padding: 11px 14px; vertical-align: middle; }
           <div class="hint">Number &ge; 0 &nbsp;|&nbsp; Total enrolled students; does not affect score</div>
         </div>
       </div>
+      <button class="demo-btn" onclick="loadDemoData()">&#9654; Load Demo School Data</button>
       <button class="btn-primary" id="analyse-btn" onclick="runSingleAnalysis()">Analyse School Risk</button>
     </div>
 
@@ -474,12 +507,10 @@ function colorFor(s) { return s >= 65 ? '#e74c3c' : s >= 35 ? '#f39c12' : '#27ae
 
 // ── TAB SWITCHING ─────────────────────────────────────────────
 function switchTab(tab) {
-  document.getElementById('content-single').style.display = tab === 'single' ? 'block' : 'none';
-  document.getElementById('content-csv').style.display    = tab === 'csv'    ? 'block' : 'none';
-  document.getElementById('content-guide').style.display  = tab === 'guide'  ? 'block' : 'none';
-  document.getElementById('tab-single').classList.toggle('active', tab === 'single');
-  document.getElementById('tab-csv').classList.toggle('active', tab === 'csv');
-  document.getElementById('tab-guide').classList.toggle('active', tab === 'guide');
+  ['single','csv','sheet','guide'].forEach(t => {
+    document.getElementById('content-'+t).style.display = tab === t ? 'block' : 'none';
+    document.getElementById('tab-'+t).classList.toggle('active', tab === t);
+  });
 }
 
 // ── SINGLE SCHOOL ─────────────────────────────────────────────
@@ -674,7 +705,288 @@ Little Flower School,70,none,40,0,999,50,45,7,55,4,3,52,yes,25,190`;
   a.download = 'sample_schools.csv';
   a.click();
 }
+
+// ── DEMO DATA ────────────────────────────────────────────────
+function loadDemoData() {
+  const demo = {
+    pending_dues_pct: '65', product_usage: 'low', hardware_pct: '45',
+    training_total: '1', days_since_last_training: '95',
+    teacher_attendance_last: '60', teacher_attendance_previous: '65',
+    open_tickets_count: '5', oldest_ticket_age: '50',
+    nps_latest: '4', nps_previous: '3',
+    student_performance_pct: '55', face_change: 'yes',
+    days_since_face_change_visit: '18', school_size: '420',
+  };
+  Object.entries(demo).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+  });
+  // Scroll to top of form
+  document.querySelector('.form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── GOOGLE SHEET SYNC ────────────────────────────────────────
+let sheetSchools = [], sheetFilter = 'all', sheetSort = 'score_desc', sheetSelectedRow = null;
+
+function openTemplate() {
+  // Download the CSV template — user imports it into Google Sheets
+  const headers = 'school_name,pending_dues_pct,product_usage,hardware_pct,training_total,days_since_last_training,teacher_attendance_last,teacher_attendance_previous,open_tickets_count,oldest_ticket_age,nps_latest,nps_previous,student_performance_pct,face_change,days_since_face_change_visit,school_size';
+  const example = 'Your School Name,20,high,80,3,30,85,80,1,5,8,7,70,no,0,500';
+  const csv = headers + '\n' + example;
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'school_retention_template.csv';
+  a.click();
+  // Show instructions
+  const errEl = document.getElementById('sheet-error');
+  errEl.style.background = '#e8f8e8';
+  errEl.style.color = '#1e7e34';
+  errEl.style.border = '1px solid #bbf0c8';
+  errEl.textContent = 'Template downloaded. Steps: (1) Open Google Sheets → File → Import → Upload the CSV. (2) Add your schools. (3) Share → Anyone with link can view. (4) Paste the Sheet URL above.';
+  errEl.classList.add('visible');
+}
+
+function extractSheetId(url) {
+  const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  return match ? match[1] : null;
+}
+
+async function analyseFromSheet() {
+  const url = document.getElementById('sheet-url').value.trim();
+  const errEl = document.getElementById('sheet-error');
+  errEl.classList.remove('visible');
+
+  if (!url) {
+    errEl.textContent = 'Please paste a Google Sheet URL.';
+    errEl.classList.add('visible');
+    return;
+  }
+
+  const sheetId = extractSheetId(url);
+  if (!sheetId) {
+    errEl.textContent = 'Could not find a Sheet ID in that URL. Make sure you paste the full Google Sheets URL.';
+    errEl.classList.add('visible');
+    return;
+  }
+
+  document.getElementById('sheet-btn').disabled = true;
+  document.getElementById('sheet-processing').classList.add('visible');
+  document.getElementById('sheet-results').style.display = 'none';
+  document.getElementById('sheet-progress-fill').style.width = '10%';
+  document.getElementById('sheet-processing-text').textContent = 'Fetching sheet data...';
+
+  try {
+    // Use Google Sheets CSV export URL (works for public sheets)
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/export?format=csv&gid=0';
+    const resp = await fetch(csvUrl);
+
+    if (!resp.ok) {
+      throw new Error('Could not access the sheet. Make sure sharing is set to "Anyone with the link can view".');
+    }
+
+    const text = await resp.text();
+    document.getElementById('sheet-progress-fill').style.width = '40%';
+    document.getElementById('sheet-processing-text').textContent = 'Parsing school data...';
+
+    const rows = text.trim().split('\n');
+    const headers = rows[0].split(',').map(h => h.replace(/"/g,'').trim());
+    const schools = rows.slice(1).map(row => {
+      // Handle quoted CSV values
+      const vals = row.match(/(".*?"|[^,]+)(?=,|$)/g) || row.split(',');
+      const obj = {};
+      headers.forEach((h, i) => { obj[h] = (vals[i]||'').replace(/"/g,'').trim(); });
+      return obj;
+    }).filter(s => s.school_name && s.school_name.length > 0);
+
+    if (schools.length === 0) {
+      throw new Error('No school data found. Make sure your Sheet has the correct column headers and at least one data row.');
+    }
+
+    document.getElementById('sheet-progress-fill').style.width = '60%';
+    document.getElementById('sheet-processing-text').textContent = 'Scoring ' + schools.length + ' schools...';
+
+    sheetSchools = schools.map((s, i) => {
+      const score = calculateRiskScore(s);
+      const flags = evaluateRedFlags(s);
+      const tier  = flags.length > 0 ? 'Red' : getRiskTier(score);
+      const pct   = Math.round(60 + ((i+1)/schools.length)*40);
+      document.getElementById('sheet-progress-fill').style.width = pct + '%';
+      return { ...s, score, flags, tier };
+    });
+
+    document.getElementById('sheet-processing').classList.remove('visible');
+    document.getElementById('sheet-results').style.display = 'block';
+    renderSheetTable();
+
+  } catch(e) {
+    document.getElementById('sheet-processing').classList.remove('visible');
+    errEl.textContent = e.message;
+    errEl.classList.add('visible');
+  }
+
+  document.getElementById('sheet-btn').disabled = false;
+}
+
+function setSheetFilter(f) {
+  sheetFilter = f;
+  ['all','red','amber','green'].forEach(x => {
+    const b = document.getElementById('sf-'+x); if(b) b.classList.remove('active');
+  });
+  const ab = document.getElementById('sf-'+f.toLowerCase()); if(ab) ab.classList.add('active');
+  renderSheetTable();
+}
+
+function setSheetSort(s) { sheetSort = s; renderSheetTable(); }
+
+function renderSheetTable() {
+  let schools = sheetFilter === 'all' ? [...sheetSchools] : sheetSchools.filter(s => s.tier === sheetFilter);
+  schools.sort((a,b) =>
+    sheetSort === 'score_desc' ? b.score-a.score :
+    sheetSort === 'score_asc'  ? a.score-b.score :
+    sheetSort === 'name_asc'   ? a.school_name.localeCompare(b.school_name) :
+    b.flags.length-a.flags.length
+  );
+  const red=sheetSchools.filter(s=>s.tier==='Red').length;
+  const amber=sheetSchools.filter(s=>s.tier==='Amber').length;
+  const green=sheetSchools.filter(s=>s.tier==='Green').length;
+  document.getElementById('sheet-results-count').textContent = schools.length+' schools — '+red+' Red, '+amber+' Amber, '+green+' Green';
+  const um = { high:'High', medium:'Medium', low:'Low', none:'None' };
+  document.getElementById('sheet-tbody').innerHTML = schools.map(s => {
+    const idx = sheetSchools.indexOf(s);
+    return '<tr onclick="openSheetDeepDive('+idx+', this)">' +
+      '<td><div class="td-school">'+s.school_name+'</div></td>' +
+      '<td><span class="score-cell '+s.tier+'">'+s.score+'</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:'+s.score+'%;background:'+colorFor(s.score)+'"></div></div></td>' +
+      '<td><span class="tier-pill '+s.tier+'">&#9679; '+s.tier+'</span></td>' +
+      '<td>'+(s.flags.length > 0 ? '<span class="flag-count">'+s.flags.length+' flag'+(s.flags.length>1?'s':'')+'</span>' : '<span style="color:#aaa;font-size:12px">—</span>')+'</td>' +
+      '<td>'+s.pending_dues_pct+'%</td><td>'+(um[s.product_usage]||s.product_usage)+'</td>' +
+      '<td>'+s.hardware_pct+'%</td><td>'+s.training_total+'/4</td><td>'+s.school_size+'</td></tr>';
+  }).join('');
+}
+
+async function openSheetDeepDive(idx, rowEl) {
+  if (sheetSelectedRow) sheetSelectedRow.classList.remove('selected');
+  rowEl.classList.add('selected'); sheetSelectedRow = rowEl;
+  const s = sheetSchools[idx];
+  const dd = document.getElementById('sheet-deep-dive');
+  dd.classList.add('visible');
+  document.getElementById('sheet-dd-title').textContent = s.school_name + ' — Deep Dive';
+  document.getElementById('sheet-dd-metrics').innerHTML = [
+    {label:'Risk Score',value:s.score+' / 100'},{label:'Risk Tier',value:s.tier},
+    {label:'Pending Dues',value:s.pending_dues_pct+'%'},{label:'Product Usage',value:s.product_usage},
+    {label:'Hardware',value:s.hardware_pct+'%'},{label:'Trainings Done',value:s.training_total+' / 4'},
+    {label:'Last Training',value:s.days_since_last_training+' days ago'},{label:'Open Tickets',value:s.open_tickets_count},
+    {label:'NPS',value:s.nps_latest+' / 10'},{label:'Student Perf',value:s.student_performance_pct+'%'},
+    {label:'School Size',value:s.school_size+' students'},{label:'Face Change',value:s.face_change},
+  ].map(m=>'<div class="dd-metric"><div class="dd-metric-label">'+m.label+'</div><div class="dd-metric-value">'+m.value+'</div></div>').join('');
+  document.getElementById('sheet-dd-flags').innerHTML = s.flags.length > 0
+    ? '<div class="flags-title" style="margin-bottom:8px">&#9876; Red Flags</div>'+
+      s.flags.map(f=>'<div class="flag-item"><div class="flag-metric">'+f.metric+'</div><div class="flag-reason">'+f.reason+'</div></div>').join('')
+    : '';
+  dd.scrollIntoView({ behavior:'smooth', block:'start' });
+  document.getElementById('sheet-dd-narrative').textContent = 'Generating AI narrative for '+s.school_name+'...';
+  try {
+    document.getElementById('sheet-dd-narrative').textContent = await fetchNarrative(s, s.score, s.tier, s.flags);
+  } catch(e) {
+    document.getElementById('sheet-dd-narrative').textContent = 'Could not generate narrative: '+e.message;
+  }
+}
+
+function closeSheetDeepDive() {
+  document.getElementById('sheet-deep-dive').classList.remove('visible');
+  if (sheetSelectedRow) { sheetSelectedRow.classList.remove('selected'); sheetSelectedRow = null; }
+}
+
 </script>
+
+
+<!-- GOOGLE SHEET TAB -->
+<div class="content" id="content-sheet" style="display:none">
+
+  <div class="sheet-card">
+    <h2>Analyse schools directly from your Google Sheet</h2>
+    <p>Paste the link to your Google Sheet below. The tool will pull your school data and run the full risk analysis — no CSV download needed. Your Sheet must be set to "Anyone with the link can view".</p>
+
+    <div class="sheet-steps">
+      <div class="sheet-step">
+        <div class="sheet-step-num">1</div>
+        <div class="sheet-step-title">Set up your Sheet</div>
+        <div class="sheet-step-desc">Use the template below. Column headers must match exactly. One school per row.</div>
+      </div>
+      <div class="sheet-step">
+        <div class="sheet-step-num">2</div>
+        <div class="sheet-step-title">Share it publicly</div>
+        <div class="sheet-step-desc">In Google Sheets: Share &rarr; Anyone with the link &rarr; Viewer. Copy the link.</div>
+      </div>
+      <div class="sheet-step">
+        <div class="sheet-step-num">3</div>
+        <div class="sheet-step-title">Paste and analyse</div>
+        <div class="sheet-step-desc">Paste the Sheet URL below and click Analyse. All schools are scored instantly.</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <a class="sheet-template-btn" onclick="openTemplate()">
+        &#128196; Open Google Sheet Template
+      </a>
+      <span style="font-size:11px;color:#aaa;margin-left:10px">Make a copy of this template and fill in your school data</span>
+    </div>
+
+    <div class="sheet-input-row">
+      <input type="text" class="sheet-input" id="sheet-url" placeholder="Paste your Google Sheet URL here — e.g. https://docs.google.com/spreadsheets/d/...">
+      <button class="sheet-btn" id="sheet-btn" onclick="analyseFromSheet()">Analyse Sheet</button>
+    </div>
+    <div class="sheet-error" id="sheet-error"></div>
+
+    <div style="font-size:11px;color:#aaa;line-height:1.6;margin-top:8px">
+      &#128274; Your data is never stored. It is fetched, scored in your browser, and discarded when you close the tab.
+    </div>
+  </div>
+
+  <div class="processing-bar" id="sheet-processing">
+    <div class="processing-text" id="sheet-processing-text">Fetching sheet data...</div>
+    <div class="progress-track"><div class="progress-fill" id="sheet-progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <div id="sheet-results" style="display:none">
+    <div class="csv-card" style="padding:16px 24px">
+      <div class="filter-row">
+        <span class="results-count" id="sheet-results-count"></span>
+        <button class="filter-btn active" id="sf-all" onclick="setSheetFilter('all')">All</button>
+        <button class="filter-btn Red" id="sf-red" onclick="setSheetFilter('Red')">&#9679; Red</button>
+        <button class="filter-btn Amber" id="sf-amber" onclick="setSheetFilter('Amber')">&#9679; Amber</button>
+        <button class="filter-btn Green" id="sf-green" onclick="setSheetFilter('Green')">&#9679; Green</button>
+        <select class="sort-select" onchange="setSheetSort(this.value)">
+          <option value="score_desc">Highest Risk First</option>
+          <option value="score_asc">Lowest Risk First</option>
+          <option value="name_asc">School Name A-Z</option>
+          <option value="flags_desc">Most Red Flags</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>School</th><th>Score</th><th>Tier</th><th>Red Flags</th>
+              <th>Pending Dues</th><th>Product Usage</th><th>Hardware</th><th>Training</th><th>Size</th>
+            </tr>
+          </thead>
+          <tbody id="sheet-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="deep-dive" id="sheet-deep-dive">
+      <div class="deep-dive-header">
+        <div class="deep-dive-title" id="sheet-dd-title">School Deep Dive</div>
+        <button class="close-btn" onclick="closeSheetDeepDive()">&#10005;</button>
+      </div>
+      <div class="dd-metric-grid" id="sheet-dd-metrics"></div>
+      <div class="dd-flags" id="sheet-dd-flags"></div>
+      <div class="dd-narrative" id="sheet-dd-narrative">Click a school row to generate the AI narrative.</div>
+    </div>
+  </div>
+
+</div>
 
 <!-- GUIDE TAB -->
 <div class="content" id="content-guide" style="display:none">
@@ -881,6 +1193,19 @@ Little Flower School,70,none,40,0,999,50,45,7,55,4,3,52,yes,25,190`;
     </div>
   </div>
 
+</div>
+
+
+<div class="footer">
+  <div class="footer-left">
+    <strong>School Retention Risk Analyser</strong><br>
+    Built by Ankit Sourabh Lakra &mdash; Strategy &amp; Operations leader learning to build with AI.<br>
+    Part of a 5-project AI upskilling journey. Weights and red flag logic derived from 8 years of EdTech operations experience.
+  </div>
+  <div class="footer-links">
+    <a href="https://www.linkedin.com/in/ankit-sourabh-lakra" target="_blank" class="footer-link">&#128101; LinkedIn</a>
+    <a href="https://solvestories.in" target="_blank" class="footer-link">&#127760; SolveStories</a>
+  </div>
 </div>
 
 </body>
