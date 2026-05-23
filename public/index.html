@@ -793,7 +793,20 @@ async function fetchNarrative(d,score,tier,flags){
 let allSchools=[],currentFilter='all',currentSort='score_desc',selectedRow=null;
 function handleDrop(e){e.preventDefault();document.getElementById('upload-area').classList.remove('dragover');if(e.dataTransfer.files[0])processCSVFile(e.dataTransfer.files[0]);}
 function handleCSVUpload(e){if(e.target.files[0])processCSVFile(e.target.files[0]);}
-function processCSVFile(file){const reader=new FileReader();reader.onload=e=>parseAndScoreCSV(e.target.result,false);reader.readAsText(file);}
+function processCSVFile(file){
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const schools=parseAndScoreCSV(e.target.result,false);
+    if(!schools||schools.length===0){
+      alert('No schools found. Check your CSV has the correct column headers.');
+      return;
+    }
+    allSchools=scoreAllSchools(schools,'');
+    document.getElementById('csv-results').style.display='block';
+    renderTable();
+  };
+  reader.readAsText(file);
+}
 
 function parseAndScoreCSV(text,isSheet){
   const rows=text.trim().split('\n');
@@ -873,7 +886,14 @@ async function analyseFromSheet(){
   document.getElementById('sheet-processing-text').textContent='Fetching sheet data...';
   try{
     const csvUrl='https://docs.google.com/spreadsheets/d/'+sheetId+'/export?format=csv&gid=0';
-    const resp=await fetch(csvUrl);
+    const isLocal=(window.location.hostname==='localhost'||window.location.protocol==='file:');
+    const sheetEndpoint=isLocal?'http://localhost:3131/sheet':'/api/sheet';
+    let resp;
+    try {
+      resp=await fetch(sheetEndpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:csvUrl})});
+    } catch(e) {
+      throw new Error('Could not reach the server. Is proxy.js running?');
+    }
     if(!resp.ok)throw new Error('Could not access the sheet. Make sure sharing is set to "Anyone with the link can view".');
     const text=await resp.text();
     document.getElementById('sheet-progress-fill').style.width='40%';
