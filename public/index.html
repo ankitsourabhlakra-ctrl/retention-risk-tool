@@ -784,7 +784,7 @@ function renderRiskCard(prefix,score,tier,flags,ms){
 
 async function fetchNarrative(d,score,tier,flags){
   const flagSummary=flags.length>0?'RED FLAGS: '+flags.map(f=>f.metric+' - '+f.reason).join('; '):'No red flags.';
-  const resp=await fetch(API_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:280,system:'You are a senior retention analyst for an EdTech K-12 company. Write a retention narrative in exactly 3 short paragraphs, no headers, no markdown, no bullet points, plain text only. Paragraph 1: what the data says right now. Paragraph 2: the most likely root cause. Paragraph 3: the single most important action this week. Be specific. Use the actual numbers.',messages:[{role:'user',content:'Risk Score: '+score+'/100. Tier: '+tier+'. '+flagSummary+' Data: pending dues '+d.pending_dues_pct+'%, usage '+d.product_usage+', hardware '+d.hardware_pct+'%, trainings '+d.training_total+'/4, last training '+d.days_since_last_training+' days ago, teacher attendance '+d.teacher_attendance_last+'%, open tickets '+d.open_tickets_count+' (oldest '+d.oldest_ticket_age+' days), NPS '+d.nps_latest+' (prev '+d.nps_previous+'), student performance '+d.student_performance_pct+'%, face change: '+d.face_change+', school size: '+d.school_size+' students.'}]})});
+  const resp=await fetch(API_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:280,system:'You are a senior retention analyst. Write exactly 3 sentences. No headers, no markdown, no bullet points. Sentence 1 (data): State the risk score and the 2 worst metrics with their numbers. Sentence 2 (cause): One sentence on the most likely root cause. Sentence 3 (action): One specific action the field team must take this week, with a deadline. Total response must be under 120 words.',messages:[{role:'user',content:'Risk Score: '+score+'/100. Tier: '+tier+'. '+flagSummary+' Data: pending dues '+d.pending_dues_pct+'%, usage '+d.product_usage+', hardware '+d.hardware_pct+'%, trainings '+d.training_total+'/4, last training '+d.days_since_last_training+' days ago, teacher attendance '+d.teacher_attendance_last+'%, open tickets '+d.open_tickets_count+' (oldest '+d.oldest_ticket_age+' days), NPS '+d.nps_latest+' (prev '+d.nps_previous+'), student performance '+d.student_performance_pct+'%, face change: '+d.face_change+', school size: '+d.school_size+' students.'}]})});
   const raw=await resp.json();
   return raw.content[0].text;
 }
@@ -870,7 +870,13 @@ function buildDeepDive(divId,prefix,s){
 // SHEET SYNC
 let sheetSchools=[],sheetFilter='all',sheetSort='score_desc',sheetSelectedRow=null;
 
-function extractSheetId(url){const m=url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);return m?m[1]:null;}
+function extractSheetId(url){
+  const m=url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  if(!m) return null;
+  // Extract gid (tab id) if present
+  const gidMatch=url.match(/[#&?]gid=(\d+)/);
+  return {id:m[1], gid:gidMatch?gidMatch[1]:'0'};
+}
 
 async function analyseFromSheet(){
   const url=document.getElementById('sheet-url').value.trim();
@@ -878,14 +884,14 @@ async function analyseFromSheet(){
   msgEl.className='sheet-msg';msgEl.classList.remove('visible');
   if(!url){msgEl.className='sheet-msg error';msgEl.textContent='Please paste a Google Sheet URL.';msgEl.classList.add('visible');return;}
   const sheetId=extractSheetId(url);
-  if(!sheetId){msgEl.className='sheet-msg error';msgEl.textContent='Could not find a Sheet ID in that URL. Make sure you paste the full Google Sheets URL.';msgEl.classList.add('visible');return;}
+  if(!sheetId||!sheetId.id){msgEl.className='sheet-msg error';msgEl.textContent='Could not find a Sheet ID in that URL. Make sure you paste the full Google Sheets URL.';msgEl.classList.add('visible');return;}
   document.getElementById('sheet-btn').disabled=true;
   document.getElementById('sheet-processing').classList.add('visible');
   document.getElementById('sheet-results').style.display='none';
   document.getElementById('sheet-progress-fill').style.width='10%';
   document.getElementById('sheet-processing-text').textContent='Fetching sheet data...';
   try{
-    const csvUrl='https://docs.google.com/spreadsheets/d/'+sheetId+'/export?format=csv&gid=0';
+    const csvUrl='https://docs.google.com/spreadsheets/d/'+sheetId.id+'/export?format=csv&gid='+sheetId.gid;
     const isLocal=(window.location.hostname==='localhost'||window.location.protocol==='file:');
     const sheetEndpoint=isLocal?'http://localhost:3131/sheet':'/api/sheet';
     let resp;
