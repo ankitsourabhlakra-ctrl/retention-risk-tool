@@ -5,196 +5,272 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>School Retention Risk Analyser</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: Arial, sans-serif; background: #f0f0f0; color: #222; }
-.topbar { background: #1a1a2e; color: white; padding: 16px 32px; display: flex; align-items: center; gap: 16px; }
-.topbar h1 { font-size: 18px; font-weight: 600; }
-.topbar-meta { font-size: 12px; color: #aaa; margin-left: auto; }
-.tabs { display: flex; background: #12122a; padding: 0 32px; }
-.tab { padding: 12px 20px; font-size: 13px; color: #888; cursor: pointer; border-bottom: 2px solid transparent; }
-.tab.active { color: white; border-bottom-color: #e8c97a; }
-.tab:hover { color: #ccc; }
-.content { padding: 28px 32px; max-width: 1300px; margin: 0 auto; }
-.single-layout { display: grid; grid-template-columns: 400px 1fr; gap: 24px; }
-.form-card { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-.form-card h2 { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
-.section-group { margin-bottom: 18px; }
-.section-group-label { font-size: 10px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
-.field { margin-bottom: 10px; }
-.field label { display: block; font-size: 11px; font-weight: 600; color: #555; text-transform: uppercase; margin-bottom: 3px; }
-.field input, .field select { width: 100%; padding: 7px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; outline: none; background: #fafafa; }
-.field input:focus, .field select:focus { border-color: #1a1a2e; background: white; }
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.field .hint { font-size: 11px; color: #aaa; margin-top: 2px; }
-.btn-primary { width: 100%; padding: 11px; background: #1a1a2e; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 6px; }
-.btn-primary:hover { background: #2d2d5e; }
-.btn-primary:disabled { background: #999; cursor: not-allowed; }
-.result-panel { display: flex; flex-direction: column; gap: 14px; }
-.empty-state { background: white; border-radius: 10px; padding: 60px 32px; text-align: center; color: #bbb; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-.empty-state .icon { font-size: 40px; margin-bottom: 12px; }
-.risk-card { background: white; border-radius: 10px; padding: 22px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border-left: 5px solid #ddd; display: none; }
-.risk-card.visible { display: block; }
-.risk-card.Red { border-left-color: #e74c3c; }
-.risk-card.Amber { border-left-color: #f39c12; }
-.risk-card.Green { border-left-color: #27ae60; }
-.card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
-.risk-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; }
-.risk-badge.Red { background: #fde8e8; color: #c0392b; }
-.risk-badge.Amber { background: #fef3cd; color: #b7770d; }
-.risk-badge.Green { background: #e8f8e8; color: #1e7e34; }
-.risk-dot { width: 8px; height: 8px; border-radius: 50%; }
-.Red .risk-dot { background: #e74c3c; }
-.Amber .risk-dot { background: #f39c12; }
-.Green .risk-dot { background: #27ae60; }
-.score-block { text-align: right; }
-.score-num { font-size: 42px; font-weight: 700; color: #222; line-height: 1; }
-.score-label { font-size: 11px; color: #aaa; text-transform: uppercase; margin-top: 2px; }
-.flags-section { display: none; margin-bottom: 14px; }
-.flags-section.visible { display: block; }
-.flags-title { font-size: 11px; font-weight: 700; color: #c0392b; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
-.flag-item { display: flex; align-items: flex-start; gap: 10px; background: #fde8e8; border: 1px solid #f5c6c6; border-radius: 6px; padding: 8px 12px; margin-bottom: 5px; }
-.flag-metric { font-size: 11px; font-weight: 700; color: #c0392b; flex-shrink: 0; min-width: 130px; }
-.flag-reason { font-size: 12px; color: #666; line-height: 1.4; }
-.info-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.info-box { background: #f8f8f8; border-radius: 8px; padding: 12px; }
-.info-box-label { font-size: 10px; font-weight: 700; color: #aaa; text-transform: uppercase; margin-bottom: 4px; }
-.info-box-text { font-size: 13px; color: #333; line-height: 1.5; }
-.breakdown-card { background: white; border-radius: 10px; padding: 18px 22px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); display: none; }
-.breakdown-card.visible { display: block; }
-.breakdown-title { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 14px; }
-.metric-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.metric-bar-label { font-size: 12px; color: #555; width: 160px; flex-shrink: 0; }
-.metric-bar-track { flex: 1; height: 6px; background: #eee; border-radius: 3px; overflow: hidden; }
-.metric-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
-.metric-bar-score { font-size: 11px; font-family: monospace; color: #aaa; width: 28px; text-align: right; flex-shrink: 0; }
-.metric-bar-weight { font-size: 10px; color: #ccc; width: 28px; text-align: right; flex-shrink: 0; }
-.narrative-card { background: white; border-radius: 10px; padding: 18px 22px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); display: none; }
-.narrative-card.visible { display: block; }
-.narrative-title { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 10px; }
-.narrative-text { font-size: 13px; color: #444; line-height: 1.7; }
-.csv-card { background: white; border-radius: 10px; padding: 28px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 20px; }
-.csv-card h2 { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 6px; }
-.csv-card p { font-size: 13px; color: #888; margin-bottom: 18px; line-height: 1.5; }
-.upload-area { border: 2px dashed #ddd; border-radius: 8px; padding: 32px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 16px; }
-.upload-area:hover { border-color: #1a1a2e; background: #f8f8ff; }
-.upload-area.dragover { border-color: #1a1a2e; background: #f0f0ff; }
-.upload-icon { font-size: 32px; margin-bottom: 8px; }
-.upload-text { font-size: 14px; color: #555; margin-bottom: 4px; }
-.upload-hint { font-size: 12px; color: #aaa; }
-.upload-input { display: none; }
-.filter-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-.filter-btn { padding: 6px 16px; border-radius: 20px; border: 1px solid #ddd; background: white; font-size: 12px; cursor: pointer; transition: all 0.15s; }
-.filter-btn.active { background: #1a1a2e; color: white; border-color: #1a1a2e; }
-.filter-btn.Red.active { background: #e74c3c; border-color: #e74c3c; }
-.filter-btn.Amber.active { background: #f39c12; border-color: #f39c12; }
-.filter-btn.Green.active { background: #27ae60; border-color: #27ae60; }
-.sort-select { padding: 6px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; outline: none; margin-left: auto; }
-.results-count { font-size: 12px; color: #aaa; }
-.table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-thead th { background: #f5f5f5; padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #eee; cursor: pointer; user-select: none; white-space: nowrap; }
-tbody tr { border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: background 0.1s; }
-tbody tr:hover { background: #fafafa; }
-tbody tr.selected { background: #f0f0ff; }
-td { padding: 11px 14px; vertical-align: middle; }
-.td-school { font-weight: 500; color: #222; }
-.tier-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
-.tier-pill.Red { background: #fde8e8; color: #c0392b; }
-.tier-pill.Amber { background: #fef3cd; color: #b7770d; }
-.tier-pill.Green { background: #e8f8e8; color: #1e7e34; }
-.score-cell { font-size: 15px; font-weight: 700; }
-.score-cell.Red { color: #e74c3c; }
-.score-cell.Amber { color: #f39c12; }
-.score-cell.Green { color: #27ae60; }
-.flag-count { display: inline-block; background: #fde8e8; color: #c0392b; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
-.mini-bar-track { width: 80px; height: 4px; background: #eee; border-radius: 2px; overflow: hidden; display: inline-block; vertical-align: middle; margin-left: 6px; }
-.mini-bar-fill { height: 100%; border-radius: 2px; }
-.deep-dive { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-top: 20px; display: none; border-top: 3px solid #1a1a2e; }
-.deep-dive.visible { display: block; }
-.deep-dive-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.deep-dive-title { font-size: 15px; font-weight: 600; color: #1a1a2e; }
-.close-btn { background: none; border: none; font-size: 18px; color: #aaa; cursor: pointer; padding: 4px 8px; }
-.dd-metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
-.dd-metric { background: #f8f8f8; border-radius: 6px; padding: 10px 12px; }
-.dd-metric-label { font-size: 10px; color: #aaa; text-transform: uppercase; font-weight: 600; margin-bottom: 3px; }
-.dd-metric-value { font-size: 13px; font-weight: 500; color: #222; }
-.dd-narrative { background: #f0f0ff; border-radius: 8px; padding: 16px; font-size: 13px; color: #333; line-height: 1.7; }
-.dd-flags { margin-bottom: 14px; }
-.processing-bar { background: white; border-radius: 10px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); display: none; }
-.processing-bar.visible { display: block; }
-.processing-text { font-size: 13px; color: #888; margin-bottom: 8px; }
-.progress-track { height: 4px; background: #eee; border-radius: 2px; overflow: hidden; }
-.progress-fill { height: 100%; background: #1a1a2e; border-radius: 2px; transition: width 0.3s; }
-.error-msg { display: none; background: #fde8e8; color: #c0392b; padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-top: 10px; }
-.error-msg.visible { display: block; }
-.sample-btn { padding: 8px 16px; background: transparent; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; color: #666; cursor: pointer; margin-bottom: 12px; }
-.sample-btn:hover { border-color: #1a1a2e; color: #1a1a2e; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Arial,sans-serif;background:#f0f0f0;color:#222;}
+.topbar{background:#1a1a2e;color:white;padding:16px 32px;display:flex;align-items:center;gap:16px;}
+.topbar h1{font-size:18px;font-weight:600;}
+.topbar-meta{font-size:12px;color:#aaa;margin-left:auto;}
+.tabs{display:flex;background:#12122a;padding:0 32px;overflow-x:auto;}
+.tab{padding:12px 20px;font-size:13px;color:#888;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;}
+.tab.active{color:white;border-bottom-color:#e8c97a;}
+.tab:hover{color:#ccc;}
+.content{padding:28px 32px;max-width:1300px;margin:0 auto;}
+/* FORM */
+.single-layout{display:grid;grid-template-columns:400px 1fr;gap:24px;}
+.form-card{background:white;border-radius:10px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+.form-card h2{font-size:15px;font-weight:600;color:#333;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid #eee;}
+.section-group{margin-bottom:18px;}
+.section-group-label{font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
+.field{margin-bottom:10px;}
+.field label{display:block;font-size:11px;font-weight:600;color:#555;text-transform:uppercase;margin-bottom:3px;}
+.field input,.field select{width:100%;padding:7px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;outline:none;background:#fafafa;}
+.field input:focus,.field select:focus{border-color:#1a1a2e;background:white;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.hint{font-size:11px;color:#aaa;margin-top:2px;}
+.btn-primary{width:100%;padding:11px;background:#1a1a2e;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:6px;}
+.btn-primary:hover{background:#2d2d5e;}
+.btn-primary:disabled{background:#999;cursor:not-allowed;}
+.demo-btn{width:100%;padding:9px;background:transparent;border:1px dashed #e8c97a;color:#e8c97a;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;margin-bottom:8px;transition:all 0.15s;}
+.demo-btn:hover{background:rgba(232,201,122,0.08);}
+/* RESULTS */
+.result-panel{display:flex;flex-direction:column;gap:14px;}
+.empty-state{background:white;border-radius:10px;padding:60px 32px;text-align:center;color:#bbb;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+.empty-state .icon{font-size:40px;margin-bottom:12px;}
+.risk-card{background:white;border-radius:10px;padding:22px;box-shadow:0 1px 4px rgba(0,0,0,0.08);border-left:5px solid #ddd;display:none;}
+.risk-card.visible{display:block;}
+.risk-card.Red{border-left-color:#e74c3c;}
+.risk-card.Amber{border-left-color:#f39c12;}
+.risk-card.Green{border-left-color:#27ae60;}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
+.risk-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;}
+.risk-badge.Red{background:#fde8e8;color:#c0392b;}
+.risk-badge.Amber{background:#fef3cd;color:#b7770d;}
+.risk-badge.Green{background:#e8f8e8;color:#1e7e34;}
+.risk-dot{width:8px;height:8px;border-radius:50%;}
+.Red .risk-dot{background:#e74c3c;}
+.Amber .risk-dot{background:#f39c12;}
+.Green .risk-dot{background:#27ae60;}
+.score-block{text-align:right;}
+.score-num{font-size:42px;font-weight:700;color:#222;line-height:1;}
+.score-label{font-size:11px;color:#aaa;text-transform:uppercase;margin-top:2px;}
+.flags-section{display:none;margin-bottom:14px;}
+.flags-section.visible{display:block;}
+.flags-title{font-size:11px;font-weight:700;color:#c0392b;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;}
+.flag-item{display:flex;align-items:flex-start;gap:10px;background:#fde8e8;border:1px solid #f5c6c6;border-radius:6px;padding:8px 12px;margin-bottom:5px;}
+.flag-metric{font-size:11px;font-weight:700;color:#c0392b;flex-shrink:0;min-width:130px;}
+.flag-reason{font-size:12px;color:#666;line-height:1.4;}
+.info-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.info-box{background:#f8f8f8;border-radius:8px;padding:12px;}
+.info-box-label{font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;margin-bottom:4px;}
+.info-box-text{font-size:13px;color:#333;line-height:1.5;}
+.breakdown-card{background:white;border-radius:10px;padding:18px 22px;box-shadow:0 1px 4px rgba(0,0,0,0.08);display:none;}
+.breakdown-card.visible{display:block;}
+.breakdown-title{font-size:13px;font-weight:600;color:#333;margin-bottom:14px;}
+.metric-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.metric-bar-label{font-size:12px;color:#555;width:160px;flex-shrink:0;}
+.metric-bar-track{flex:1;height:6px;background:#eee;border-radius:3px;overflow:hidden;}
+.metric-bar-fill{height:100%;border-radius:3px;transition:width 0.5s;}
+.metric-bar-score{font-size:11px;font-family:monospace;color:#aaa;width:28px;text-align:right;flex-shrink:0;}
+.metric-bar-weight{font-size:10px;color:#ccc;width:28px;text-align:right;flex-shrink:0;}
+.narrative-card{background:white;border-radius:10px;padding:18px 22px;box-shadow:0 1px 4px rgba(0,0,0,0.08);display:none;}
+.narrative-card.visible{display:block;}
+.narrative-title{font-size:13px;font-weight:600;color:#333;margin-bottom:10px;}
+.narrative-text{font-size:13px;color:#444;line-height:1.7;}
+/* CSV/BATCH */
+.csv-card{background:white;border-radius:10px;padding:28px;box-shadow:0 1px 4px rgba(0,0,0,0.08);margin-bottom:20px;}
+.csv-card h2{font-size:15px;font-weight:600;color:#333;margin-bottom:6px;}
+.csv-card p{font-size:13px;color:#888;margin-bottom:18px;line-height:1.5;}
+.upload-area{border:2px dashed #ddd;border-radius:8px;padding:32px;text-align:center;cursor:pointer;transition:all 0.2s;margin-bottom:16px;}
+.upload-area:hover{border-color:#1a1a2e;background:#f8f8ff;}
+.upload-area.dragover{border-color:#1a1a2e;background:#f0f0ff;}
+.upload-icon{font-size:32px;margin-bottom:8px;}
+.upload-text{font-size:14px;color:#555;margin-bottom:4px;}
+.upload-hint{font-size:12px;color:#aaa;}
+.upload-input{display:none;}
+.filter-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+.filter-btn{padding:6px 16px;border-radius:20px;border:1px solid #ddd;background:white;font-size:12px;cursor:pointer;transition:all 0.15s;}
+.filter-btn.active{background:#1a1a2e;color:white;border-color:#1a1a2e;}
+.filter-btn.Red.active{background:#e74c3c;border-color:#e74c3c;}
+.filter-btn.Amber.active{background:#f39c12;border-color:#f39c12;}
+.filter-btn.Green.active{background:#27ae60;border-color:#27ae60;}
+.sort-select{padding:6px 12px;border:1px solid #ddd;border-radius:6px;font-size:12px;outline:none;margin-left:auto;}
+.results-count{font-size:12px;color:#aaa;}
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{background:#f5f5f5;padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;border-bottom:1px solid #eee;cursor:pointer;user-select:none;white-space:nowrap;}
+tbody tr{border-bottom:1px solid #f0f0f0;cursor:pointer;transition:background 0.1s;}
+tbody tr:hover{background:#fafafa;}
+tbody tr.selected{background:#f0f0ff;}
+td{padding:11px 14px;vertical-align:middle;}
+.td-school{font-weight:500;color:#222;}
+.tier-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;}
+.tier-pill.Red{background:#fde8e8;color:#c0392b;}
+.tier-pill.Amber{background:#fef3cd;color:#b7770d;}
+.tier-pill.Green{background:#e8f8e8;color:#1e7e34;}
+.score-cell{font-size:15px;font-weight:700;}
+.score-cell.Red{color:#e74c3c;}
+.score-cell.Amber{color:#f39c12;}
+.score-cell.Green{color:#27ae60;}
+.flag-count{display:inline-block;background:#fde8e8;color:#c0392b;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;}
+.mini-bar-track{width:80px;height:4px;background:#eee;border-radius:2px;overflow:hidden;display:inline-block;vertical-align:middle;margin-left:6px;}
+.mini-bar-fill{height:100%;border-radius:2px;}
+.deep-dive{background:white;border-radius:10px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,0.08);margin-top:20px;display:none;border-top:3px solid #1a1a2e;}
+.deep-dive.visible{display:block;}
+.deep-dive-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.deep-dive-title{font-size:15px;font-weight:600;color:#1a1a2e;}
+.close-btn{background:none;border:none;font-size:18px;color:#aaa;cursor:pointer;padding:4px 8px;}
+.dd-metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.dd-metric{background:#f8f8f8;border-radius:6px;padding:10px 12px;}
+.dd-metric-label{font-size:10px;color:#aaa;text-transform:uppercase;font-weight:600;margin-bottom:3px;}
+.dd-metric-value{font-size:13px;font-weight:500;color:#222;}
+.dd-narrative{background:#f0f0ff;border-radius:8px;padding:16px;font-size:13px;color:#333;line-height:1.7;}
+.dd-flags{margin-bottom:14px;}
+.processing-bar{background:white;border-radius:10px;padding:20px 24px;box-shadow:0 1px 4px rgba(0,0,0,0.08);display:none;}
+.processing-bar.visible{display:block;}
+.processing-text{font-size:13px;color:#888;margin-bottom:8px;}
+.progress-track{height:4px;background:#eee;border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:#1a1a2e;border-radius:2px;transition:width 0.3s;}
+.sample-btn{padding:8px 16px;background:transparent;border:1px solid #ddd;border-radius:6px;font-size:12px;color:#666;cursor:pointer;margin-bottom:12px;}
+.sample-btn:hover{border-color:#1a1a2e;color:#1a1a2e;}
+/* SHEET TAB */
+.sheet-card{background:white;border-radius:10px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,0.08);margin-bottom:20px;}
+.sheet-card h2{font-size:15px;font-weight:600;color:#333;margin-bottom:6px;}
+.sheet-card p{font-size:13px;color:#888;margin-bottom:16px;line-height:1.5;}
+.sheet-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+.sheet-step{background:#f8f8f8;border-radius:8px;padding:14px;}
+.sheet-step-num{font-size:11px;font-weight:700;color:#e8c97a;background:#1a1a2e;display:inline-block;width:20px;height:20px;border-radius:50%;text-align:center;line-height:20px;margin-bottom:7px;}
+.sheet-step-title{font-size:12px;font-weight:600;color:#222;margin-bottom:3px;}
+.sheet-step-desc{font-size:11px;color:#888;line-height:1.4;}
+.sheet-input-row{display:flex;gap:10px;margin-bottom:12px;}
+.sheet-input{flex:1;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;outline:none;}
+.sheet-input:focus{border-color:#1a1a2e;}
+.sheet-btn{padding:9px 20px;background:#1a1a2e;color:white;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.sheet-btn:hover{background:#2d2d5e;}
+.sheet-btn:disabled{background:#999;cursor:not-allowed;}
+.sheet-link-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#f0f7ff;border:1px solid #b3d4f5;border-radius:6px;font-size:12px;color:#1a5fb4;text-decoration:none;cursor:pointer;margin-right:10px;}
+.sheet-link-btn:hover{background:#ddeeff;}
+.sheet-dl-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#f0fff4;border:1px solid #b3f0c8;border-radius:6px;font-size:12px;color:#1e7e34;text-decoration:none;cursor:pointer;}
+.sheet-dl-btn:hover{background:#ddffee;}
+.sheet-msg{padding:10px 14px;border-radius:6px;font-size:12px;margin-top:8px;display:none;line-height:1.5;}
+.sheet-msg.visible{display:block;}
+.sheet-msg.error{background:#fde8e8;color:#c0392b;}
+.sheet-msg.success{background:#e8f8e8;color:#1e7e34;border:1px solid #bbf0c8;}
+/* GUIDE */
+.guide-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px;}
+.guide-card{background:white;border-radius:10px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+.guide-card h3{font-size:14px;font-weight:600;color:#1a1a2e;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #eee;}
+.guide-step{display:flex;gap:14px;margin-bottom:14px;}
+.guide-step:last-child{margin-bottom:0;}
+.step-circle{width:28px;height:28px;border-radius:50%;background:#1a1a2e;color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step-content{flex:1;}
+.step-title{font-size:13px;font-weight:600;color:#222;margin-bottom:3px;}
+.step-desc{font-size:12px;color:#888;line-height:1.5;}
+.metric-table{width:100%;border-collapse:collapse;font-size:12px;}
+.metric-table th{background:#f5f5f5;padding:9px 12px;text-align:left;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;border-bottom:1px solid #eee;}
+.metric-table td{padding:10px 12px;border-bottom:1px solid #f5f5f5;vertical-align:top;line-height:1.5;color:#444;}
+.metric-table tr:last-child td{border-bottom:none;}
+.metric-name{font-weight:600;color:#222;}
+.metric-weight{font-family:monospace;font-size:11px;font-weight:700;}
+.w-high{color:#c0392b;} .w-med{color:#b7770d;} .w-low{color:#1e7e34;}
+.flag-pill{display:inline-block;background:#fde8e8;color:#c0392b;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap;}
+.tier-explain{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;}
+.tier-box{border-radius:8px;padding:16px;text-align:center;}
+.tier-box.Red{background:#fde8e8;border:1px solid #f5c6c6;}
+.tier-box.Amber{background:#fef3cd;border:1px solid #fde68a;}
+.tier-box.Green{background:#e8f8e8;border:1px solid #bbf0c8;}
+.tier-box-label{font-size:13px;font-weight:700;margin-bottom:6px;}
+.tier-box.Red .tier-box-label{color:#c0392b;}
+.tier-box.Amber .tier-box-label{color:#b7770d;}
+.tier-box.Green .tier-box-label{color:#1e7e34;}
+.tier-box-score{font-size:11px;color:#666;margin-bottom:6px;font-family:monospace;}
+.tier-box-desc{font-size:11px;color:#666;line-height:1.4;}
+.guide-section-title{font-size:16px;font-weight:600;color:#1a1a2e;margin-bottom:14px;}
+.guide-full{background:white;border-radius:10px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,0.08);margin-bottom:20px;}
+/* FOOTER */
+.footer{background:#1a1a2e;color:#aaa;padding:20px 32px;display:flex;align-items:center;justify-content:space-between;font-size:12px;margin-top:40px;}
+.footer-left{line-height:1.6;}
+.footer-left strong{color:white;}
+.footer-links{display:flex;gap:16px;}
+.footer-link{color:#aaa;text-decoration:none;display:flex;align-items:center;gap:5px;}
+.footer-link:hover{color:white;}
 
-/* GUIDE PAGE */
-.guide-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
-.guide-card { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-.guide-card h3 { font-size: 14px; font-weight: 600; color: #1a1a2e; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
-.guide-step { display: flex; gap: 14px; margin-bottom: 14px; }
-.guide-step:last-child { margin-bottom: 0; }
-.step-circle { width: 28px; height: 28px; border-radius: 50%; background: #1a1a2e; color: white; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
-.step-content { flex: 1; }
-.step-title { font-size: 13px; font-weight: 600; color: #222; margin-bottom: 3px; }
-.step-desc { font-size: 12px; color: #888; line-height: 1.5; }
-.metric-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.metric-table th { background: #f5f5f5; padding: 9px 12px; text-align: left; font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; border-bottom: 1px solid #eee; }
-.metric-table td { padding: 10px 12px; border-bottom: 1px solid #f5f5f5; vertical-align: top; line-height: 1.5; color: #444; }
-.metric-table tr:last-child td { border-bottom: none; }
-.metric-table tr:hover td { background: #fafafa; }
-.metric-name { font-weight: 600; color: #222; white-space: nowrap; }
-.metric-weight { font-family: monospace; font-size: 11px; font-weight: 700; }
-.w-high { color: #c0392b; }
-.w-med  { color: #b7770d; }
-.w-low  { color: #1e7e34; }
-.flag-pill { display: inline-block; background: #fde8e8; color: #c0392b; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; white-space: nowrap; }
-.tier-explain { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 28px; }
-.tier-box { border-radius: 8px; padding: 16px; text-align: center; }
-.tier-box.Red { background: #fde8e8; border: 1px solid #f5c6c6; }
-.tier-box.Amber { background: #fef3cd; border: 1px solid #fde68a; }
-.tier-box.Green { background: #e8f8e8; border: 1px solid #bbf0c8; }
-.tier-box-label { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
-.tier-box.Red .tier-box-label { color: #c0392b; }
-.tier-box.Amber .tier-box-label { color: #b7770d; }
-.tier-box.Green .tier-box-label { color: #1e7e34; }
-.tier-box-score { font-size: 11px; color: #666; margin-bottom: 6px; font-family: monospace; }
-.tier-box-desc { font-size: 11px; color: #666; line-height: 1.4; }
-.guide-section-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 14px; }
-.guide-full { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 20px; }
+/* ── MOBILE RESPONSIVE ───────────────────────────────────────── */
+@media (max-width: 768px) {
+  .content { padding: 16px; }
+  .topbar { padding: 14px 16px; }
+  .topbar h1 { font-size: 15px; }
+  .topbar-meta { display: none; }
+  .tabs { padding: 0 16px; }
+  .tab { padding: 10px 14px; font-size: 12px; }
 
-.footer { background: #1a1a2e; color: #aaa; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; margin-top: 40px; }
-.footer-left { line-height: 1.6; }
-.footer-left strong { color: white; }
-.footer-links { display: flex; gap: 16px; }
-.footer-link { color: #aaa; text-decoration: none; display: flex; align-items: center; gap: 5px; }
-.footer-link:hover { color: white; }
+  /* Single school: stack form above results */
+  .single-layout { grid-template-columns: 1fr; }
 
-/* DEMO BUTTON */
-.demo-btn { width: 100%; padding: 9px; background: transparent; border: 1px dashed #e8c97a; color: #e8c97a; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; margin-bottom: 8px; transition: all 0.15s; }
-.demo-btn:hover { background: rgba(232,201,122,0.08); }
+  /* Two-col fields: keep side by side on tablet, stack on small phones */
+  .field-row { grid-template-columns: 1fr 1fr; }
 
-/* GOOGLE SHEET */
-.sheet-card { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 20px; }
-.sheet-card h2 { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 6px; }
-.sheet-card p { font-size: 13px; color: #888; margin-bottom: 16px; line-height: 1.5; }
-.sheet-input-row { display: flex; gap: 10px; margin-bottom: 12px; }
-.sheet-input { flex: 1; padding: 9px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; outline: none; }
-.sheet-input:focus { border-color: #1a1a2e; }
-.sheet-btn { padding: 9px 20px; background: #1a1a2e; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
-.sheet-btn:hover { background: #2d2d5e; }
-.sheet-btn:disabled { background: #999; cursor: not-allowed; }
-.sheet-steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 16px; }
-.sheet-step { background: #f8f8f8; border-radius: 8px; padding: 14px; }
-.sheet-step-num { font-size: 11px; font-weight: 700; color: #e8c97a; background: #1a1a2e; display: inline-block; width: 20px; height: 20px; border-radius: 50%; text-align: center; line-height: 20px; margin-bottom: 7px; }
-.sheet-step-title { font-size: 12px; font-weight: 600; color: #222; margin-bottom: 3px; }
-.sheet-step-desc { font-size: 11px; color: #888; line-height: 1.4; }
-.sheet-template-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #f0f7ff; border: 1px solid #b3d4f5; border-radius: 6px; font-size: 12px; color: #1a5fb4; text-decoration: none; cursor: pointer; }
-.sheet-template-btn:hover { background: #ddeeff; }
-.sheet-error { background: #fde8e8; color: #c0392b; padding: 10px 14px; border-radius: 6px; font-size: 12px; margin-top: 8px; display: none; }
-.sheet-error.visible { display: block; }
+  /* Overview grid: single column */
+  .guide-grid { grid-template-columns: 1fr; }
+
+  /* Tier explain: stack vertically */
+  .tier-explain { grid-template-columns: 1fr; }
+
+  /* Metric deep dive: 2 cols instead of 3 */
+  .dd-metric-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Sheet steps: stack */
+  .sheet-steps { grid-template-columns: 1fr; }
+
+  /* Sheet input row: stack */
+  .sheet-input-row { flex-direction: column; }
+  .sheet-btn { width: 100%; }
+
+  /* Filter row: wrap nicely */
+  .filter-row { gap: 8px; }
+  .sort-select { margin-left: 0; width: 100%; }
+
+  /* Table: make it scrollable with readable min widths */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { min-width: 600px; }
+
+  /* Footer: stack */
+  .footer { flex-direction: column; gap: 14px; padding: 20px 16px; }
+  .footer-links { justify-content: flex-start; }
+
+  /* Score number: smaller */
+  .score-num { font-size: 32px; }
+
+  /* Metric guide table: allow horizontal scroll */
+  .metric-table { font-size: 11px; }
+  .guide-full { padding: 16px; }
+
+  /* CSV card padding */
+  .csv-card { padding: 16px; }
+  .sheet-card { padding: 16px; }
+  .form-card { padding: 16px; }
+}
+
+@media (max-width: 480px) {
+  /* Extra small phones: stack field-row too */
+  .field-row { grid-template-columns: 1fr; }
+
+  /* Deep dive: single column */
+  .dd-metric-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Guide cards full width */
+  .guide-card { padding: 16px; }
+
+  /* Table columns: hide less important ones */
+  table th:nth-child(5),
+  table td:nth-child(5),
+  table th:nth-child(8),
+  table td:nth-child(8),
+  table th:nth-child(9),
+  table td:nth-child(9) { display: none; }
+
+  .topbar h1 { font-size: 14px; }
+  .tab { padding: 9px 10px; font-size: 11px; }
+}
 </style>
 </head>
 <body>
@@ -211,7 +287,7 @@ td { padding: 11px 14px; vertical-align: middle; }
   <div class="tab" id="tab-guide" onclick="switchTab('guide')">How to Use &amp; Metric Guide</div>
 </div>
 
-<!-- SINGLE TAB -->
+<!-- SINGLE SCHOOL TAB -->
 <div class="content" id="content-single">
   <div class="single-layout">
     <div class="form-card">
@@ -221,7 +297,7 @@ td { padding: 11px 14px; vertical-align: middle; }
         <div class="field">
           <label>Pending Dues %</label>
           <input type="number" id="pending_dues_pct" placeholder="e.g. 30" min="0" max="100">
-          <div class="hint">Number 0–100 &nbsp;|&nbsp; E.g. ₹3L unpaid of ₹10L total = enter 30</div>
+          <div class="hint">Number 0&#8211;100 &nbsp;|&nbsp; E.g. &#8377;3L unpaid of &#8377;10L total = enter 30</div>
         </div>
       </div>
       <div class="section-group">
@@ -235,11 +311,12 @@ td { padding: 11px 14px; vertical-align: middle; }
             <option value="low">Low</option>
             <option value="none">None</option>
           </select>
+          <div class="hint">Select one &nbsp;|&nbsp; Overall usage level observed by field team</div>
         </div>
         <div class="field">
-          <label>Hardware — % Classes Equipped</label>
+          <label>Hardware &#8212; % Classes Equipped</label>
           <input type="number" id="hardware_pct" placeholder="e.g. 60" min="0" max="100">
-          <div class="hint">Number 0–100 &nbsp;|&nbsp; % of classrooms with working hardware</div>
+          <div class="hint">Number 0&#8211;100 &nbsp;|&nbsp; % of classrooms with working hardware</div>
         </div>
       </div>
       <div class="section-group">
@@ -248,21 +325,24 @@ td { padding: 11px 14px; vertical-align: middle; }
           <div class="field">
             <label>Total Trainings Done</label>
             <input type="number" id="training_total" placeholder="e.g. 2" min="0">
-            <div class="hint">Number 0–4 &nbsp;|&nbsp; sessions completed this year</div>
+            <div class="hint">Number 0&#8211;4 &nbsp;|&nbsp; sessions this year</div>
           </div>
           <div class="field">
             <label>Days Since Last Training</label>
             <input type="number" id="days_since_last_training" placeholder="e.g. 30" min="0">
+            <div class="hint">Number &ge;0 &nbsp;|&nbsp; Enter 999 if never</div>
           </div>
         </div>
         <div class="field-row">
           <div class="field">
             <label>Teacher Attendance Last %</label>
             <input type="number" id="teacher_attendance_last" placeholder="e.g. 80" min="0" max="100">
+            <div class="hint">Number 0&#8211;100 &nbsp;|&nbsp; % at last session</div>
           </div>
           <div class="field">
             <label>Teacher Attendance Prev %</label>
             <input type="number" id="teacher_attendance_previous" placeholder="e.g. 70" min="0" max="100">
+            <div class="hint">Number 0&#8211;100 &nbsp;|&nbsp; % at session before last</div>
           </div>
         </div>
       </div>
@@ -272,10 +352,12 @@ td { padding: 11px 14px; vertical-align: middle; }
           <div class="field">
             <label>Open Tickets Count</label>
             <input type="number" id="open_tickets_count" placeholder="e.g. 3" min="0">
+            <div class="hint">Number &ge;0 &nbsp;|&nbsp; Total unresolved</div>
           </div>
           <div class="field">
             <label>Oldest Ticket (days)</label>
             <input type="number" id="oldest_ticket_age" placeholder="e.g. 20" min="0">
+            <div class="hint">Number &ge;0 &nbsp;|&nbsp; Enter 0 if no open tickets</div>
           </div>
         </div>
       </div>
@@ -285,15 +367,18 @@ td { padding: 11px 14px; vertical-align: middle; }
           <div class="field">
             <label>NPS Latest</label>
             <input type="number" id="nps_latest" placeholder="e.g. 7" min="0" max="10">
+            <div class="hint">Number 0&#8211;10 &nbsp;|&nbsp; Most recent survey</div>
           </div>
           <div class="field">
             <label>NPS Previous</label>
             <input type="number" id="nps_previous" placeholder="e.g. 6" min="0" max="10">
+            <div class="hint">Number 0&#8211;10 &nbsp;|&nbsp; Same as latest if only one</div>
           </div>
         </div>
         <div class="field">
           <label>Student Performance Avg %</label>
           <input type="number" id="student_performance_pct" placeholder="e.g. 65" min="0" max="100">
+          <div class="hint">Number 0&#8211;100 &nbsp;|&nbsp; Avg marks across classes using product</div>
         </div>
       </div>
       <div class="section-group">
@@ -309,12 +394,13 @@ td { padding: 11px 14px; vertical-align: middle; }
           <div class="field">
             <label>Days Since Face Change Visit</label>
             <input type="number" id="days_since_face_change_visit" placeholder="e.g. 10" min="0">
+            <div class="hint">Number &ge;0 &nbsp;|&nbsp; 0 if no change or already visited</div>
           </div>
         </div>
         <div class="field">
           <label>School Size (students)</label>
           <input type="number" id="school_size" placeholder="e.g. 400" min="0">
-          <div class="hint">Number &ge; 0 &nbsp;|&nbsp; Total enrolled students; does not affect score</div>
+          <div class="hint">Number &ge;0 &nbsp;|&nbsp; Total enrolled; does not affect score</div>
         </div>
       </div>
       <button class="demo-btn" onclick="loadDemoData()">&#9654; Load Demo School Data</button>
@@ -323,8 +409,8 @@ td { padding: 11px 14px; vertical-align: middle; }
 
     <div class="result-panel">
       <div class="empty-state" id="single-empty">
-        <div class="icon">🏫</div>
-        <p>Fill in school metrics and click Analyse</p>
+        <div class="icon">&#127983;</div>
+        <p>Fill in school metrics and click Analyse<br><span style="font-size:12px;margin-top:6px;display:block">Or click <strong>Load Demo Data</strong> to try instantly</span></p>
       </div>
       <div class="risk-card" id="single-risk-card">
         <div class="card-top">
@@ -344,16 +430,16 @@ td { padding: 11px 14px; vertical-align: middle; }
         <div class="info-row">
           <div class="info-box">
             <div class="info-box-label">Primary Risk Signal</div>
-            <div class="info-box-text" id="single-reason">—</div>
+            <div class="info-box-text" id="single-reason">&#8212;</div>
           </div>
           <div class="info-box">
             <div class="info-box-label">Recommended Action</div>
-            <div class="info-box-text" id="single-action">—</div>
+            <div class="info-box-text" id="single-action">&#8212;</div>
           </div>
         </div>
       </div>
       <div class="breakdown-card" id="single-breakdown">
-        <div class="breakdown-title">Metric Breakdown</div>
+        <div class="breakdown-title">Metric Breakdown &#8212; What is driving the score</div>
         <div id="single-breakdown-bars"></div>
       </div>
       <div class="narrative-card" id="single-narrative">
@@ -369,23 +455,21 @@ td { padding: 11px 14px; vertical-align: middle; }
   <div class="csv-card">
     <h2>Batch School Risk Analysis</h2>
     <p>Upload a CSV with one school per row. All schools are scored instantly. Click any row for a full AI deep-dive narrative.</p>
-    <button class="sample-btn" onclick="downloadSample()">&#8595; Download Sample CSV</button>
+    <button class="sample-btn" onclick="downloadSample()">&#8595; Download 40 Sample Schools (CSV)</button>
     <div class="upload-area" id="upload-area" onclick="document.getElementById('csv-input').click()"
       ondragover="event.preventDefault();this.classList.add('dragover')"
       ondragleave="this.classList.remove('dragover')"
       ondrop="handleDrop(event)">
-      <div class="upload-icon">📂</div>
+      <div class="upload-icon">&#128194;</div>
       <div class="upload-text">Click to upload or drag and drop your CSV</div>
-      <div class="upload-hint">Columns: school_name, pending_dues_pct, product_usage, hardware_pct, training_total, days_since_last_training...</div>
+      <div class="upload-hint">Columns: school_name, pending_dues_pct, product_usage, hardware_pct...</div>
     </div>
     <input type="file" id="csv-input" class="upload-input" accept=".csv" onchange="handleCSVUpload(event)">
   </div>
-
   <div class="processing-bar" id="processing-bar">
     <div class="processing-text" id="processing-text">Processing schools...</div>
     <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
   </div>
-
   <div id="csv-results" style="display:none">
     <div class="csv-card" style="padding:16px 24px">
       <div class="filter-row">
@@ -403,19 +487,7 @@ td { padding: 11px 14px; vertical-align: middle; }
       </div>
       <div class="table-wrap">
         <table>
-          <thead>
-            <tr>
-              <th onclick="setSortAndRender('name_asc')">School</th>
-              <th onclick="setSortAndRender('score_desc')">Score</th>
-              <th>Tier</th>
-              <th>Red Flags</th>
-              <th>Pending Dues</th>
-              <th>Product Usage</th>
-              <th>Hardware</th>
-              <th>Training</th>
-              <th>Size</th>
-            </tr>
-          </thead>
+          <thead><tr><th>School</th><th>Score</th><th>Tier</th><th>Red Flags</th><th>Pending Dues</th><th>Product Usage</th><th>Hardware</th><th>Training</th><th>Size</th></tr></thead>
           <tbody id="schools-tbody"></tbody>
         </table>
       </div>
@@ -432,522 +504,47 @@ td { padding: 11px 14px; vertical-align: middle; }
   </div>
 </div>
 
-<script>
-// ── ENDPOINT — auto-detects local vs deployed ─────────────────
-const API_ENDPOINT = window.location.hostname === 'localhost' || window.location.protocol === 'file:'
-  ? 'http://localhost:3131/v1/messages'
-  : '/api/claude';
-
-// ── WEIGHTS & SCORING ─────────────────────────────────────────
-const WEIGHTS = {
-  pending_dues: 0.35, product_usage: 0.30, hardware: 0.10,
-  training: 0.10, open_tickets: 0.05, nps: 0.05,
-  student_performance: 0.03, teacher_attendance: 0.02, face_change: 0.00,
-};
-const METRIC_LABELS = {
-  pending_dues: 'Pending Dues', product_usage: 'Product Usage',
-  hardware: 'Hardware Setup', training: 'Training',
-  open_tickets: 'Open Tickets', nps: 'NPS Score',
-  student_performance: 'Student Performance', teacher_attendance: 'Teacher Attendance',
-};
-
-function normalize(value, inMin, inMax, outMin, outMax) {
-  if (inMax === inMin) return outMin;
-  return Math.round(outMin + ((value - inMin) / (inMax - inMin)) * (outMax - outMin));
-}
-
-function scoreMetrics(d) {
-  const s = {};
-  const dues = parseFloat(d.pending_dues_pct) || 0;
-  s.pending_dues = dues <= 25 ? 0 : dues <= 50 ? normalize(dues,25,50,0,40) : dues <= 75 ? normalize(dues,50,75,40,80) : normalize(dues,75,100,80,100);
-  const um = { high:0, medium:30, low:70, none:100 };
-  s.product_usage = um[d.product_usage] !== undefined ? um[d.product_usage] : 50;
-  const hw = parseFloat(d.hardware_pct) || 0;
-  s.hardware = hw >= 75 ? 0 : hw >= 50 ? normalize(hw,75,50,0,40) : hw >= 25 ? normalize(hw,50,25,40,80) : normalize(hw,25,0,80,100);
-  const ds = parseInt(d.days_since_last_training); const tt = parseInt(d.training_total) || 0;
-  s.training = tt === 0 ? 100 : ds <= 45 ? normalize(ds,0,45,0,30) : ds <= 90 ? normalize(ds,45,90,30,75) : normalize(ds,90,180,75,100);
-  const tk = parseInt(d.open_tickets_count) || 0;
-  s.open_tickets = tk === 0 ? 0 : tk === 1 ? 25 : tk <= 3 ? 50 : tk <= 9 ? normalize(tk,3,9,50,85) : 100;
-  const nps = parseFloat(d.nps_latest) || 5;
-  s.nps = nps >= 8 ? 0 : nps >= 7 ? 15 : nps >= 6 ? 30 : nps >= 5 ? 50 : nps >= 3 ? 75 : 100;
-  const pf = parseFloat(d.student_performance_pct) || 60;
-  s.student_performance = pf >= 70 ? 0 : pf >= 50 ? normalize(pf,70,50,0,70) : normalize(pf,50,30,70,100);
-  const at = parseFloat(d.teacher_attendance_last) || 75;
-  s.teacher_attendance = at >= 75 ? 0 : at >= 50 ? normalize(at,75,50,0,60) : normalize(at,50,0,60,100);
-  s.face_change = 0;
-  return s;
-}
-
-function calculateRiskScore(d) {
-  const sc = scoreMetrics(d);
-  return Math.min(100, Math.max(0, Math.round(Object.entries(WEIGHTS).reduce((t,[k,w]) => t + (sc[k]||0)*w, 0))));
-}
-
-function getRiskTier(score) {
-  return score >= 65 ? 'Red' : score >= 35 ? 'Amber' : 'Green';
-}
-
-function evaluateRedFlags(d) {
-  const f = [];
-  if (parseFloat(d.pending_dues_pct) >= 75) f.push({metric:'Pending Dues', reason: d.pending_dues_pct+'% dues pending'});
-  if (d.product_usage === 'none') f.push({metric:'Product Usage', reason:'Zero product usage'});
-  if (parseFloat(d.hardware_pct) < 25) f.push({metric:'Hardware', reason:'Only '+d.hardware_pct+'% classrooms equipped'});
-  if (parseInt(d.training_total) === 0) f.push({metric:'Training', reason:'No training ever conducted'});
-  else if (parseInt(d.days_since_last_training) >= 90) f.push({metric:'Training', reason:'No training in '+d.days_since_last_training+' days'});
-  if (parseInt(d.oldest_ticket_age) > 45) f.push({metric:'Open Tickets', reason:'Ticket open '+d.oldest_ticket_age+' days'});
-  if (parseInt(d.open_tickets_count) >= 10) f.push({metric:'Open Tickets', reason:d.open_tickets_count+' open tickets'});
-  if (parseFloat(d.nps_latest) < 5 && parseFloat(d.nps_previous) < 5) f.push({metric:'NPS', reason:'Two consecutive NPS below 5'});
-  if (parseFloat(d.student_performance_pct) < 50) f.push({metric:'Student Performance', reason:'Avg marks '+d.student_performance_pct+'%'});
-  if (parseFloat(d.teacher_attendance_last) < 75 && parseFloat(d.teacher_attendance_previous) < 75) f.push({metric:'Teacher Attendance', reason:'Two consecutive trainings below 75%'});
-  if (d.face_change === 'yes' && parseInt(d.days_since_face_change_visit) > 15) f.push({metric:'Face Change', reason:'No visit '+d.days_since_face_change_visit+' days after rep change'});
-  return f;
-}
-
-function colorFor(s) { return s >= 65 ? '#e74c3c' : s >= 35 ? '#f39c12' : '#27ae60'; }
-
-// ── TAB SWITCHING ─────────────────────────────────────────────
-function switchTab(tab) {
-  ['single','csv','sheet','guide'].forEach(t => {
-    document.getElementById('content-'+t).style.display = tab === t ? 'block' : 'none';
-    document.getElementById('tab-'+t).classList.toggle('active', tab === t);
-  });
-}
-
-// ── SINGLE SCHOOL ─────────────────────────────────────────────
-async function runSingleAnalysis() {
-  const d = {};
-  ['pending_dues_pct','product_usage','hardware_pct','training_total','days_since_last_training',
-   'teacher_attendance_last','teacher_attendance_previous','open_tickets_count','oldest_ticket_age',
-   'nps_latest','nps_previous','student_performance_pct','face_change','days_since_face_change_visit','school_size']
-  .forEach(id => { d[id] = document.getElementById(id).value; });
-
-  const score = calculateRiskScore(d);
-  const flags = evaluateRedFlags(d);
-  const tier  = flags.length > 0 ? 'Red' : getRiskTier(score);
-  const ms    = scoreMetrics(d);
-
-  document.getElementById('single-empty').style.display = 'none';
-  document.getElementById('analyse-btn').disabled = true;
-  document.getElementById('single-badge').className = 'risk-badge ' + tier;
-  document.getElementById('single-tier-text').textContent = tier + ' Risk';
-  document.getElementById('single-score').textContent = score;
-  document.getElementById('single-risk-card').className = 'risk-card visible ' + tier;
-  document.getElementById('single-flag-count').textContent = flags.length > 0 ? flags.length + ' red flag(s) — tier forced to Red' : 'No red flags triggered';
-
-  const fs = document.getElementById('single-flags-section');
-  if (flags.length > 0) {
-    fs.classList.add('visible');
-    document.getElementById('single-flags-list').innerHTML = flags.map(f =>
-      '<div class="flag-item"><div class="flag-metric">'+f.metric+'</div><div class="flag-reason">'+f.reason+'</div></div>').join('');
-  } else { fs.classList.remove('visible'); }
-
-  document.getElementById('single-breakdown').classList.add('visible');
-  document.getElementById('single-breakdown-bars').innerHTML = Object.entries(WEIGHTS)
-    .filter(([k,w]) => w > 0).sort((a,b) => (ms[b[0]]*b[1])-(ms[a[0]]*a[1]))
-    .map(([k,w]) => { const sc=ms[k]||0; return '<div class="metric-bar-row"><div class="metric-bar-label">'+METRIC_LABELS[k]+'</div><div class="metric-bar-track"><div class="metric-bar-fill" style="width:'+sc+'%;background:'+colorFor(sc)+'"></div></div><div class="metric-bar-score">'+sc+'</div><div class="metric-bar-weight">'+Math.round(w*100)+'%</div></div>'; }).join('');
-
-  document.getElementById('single-narrative').classList.add('visible');
-  document.getElementById('single-narrative-text').textContent = 'Generating AI narrative...';
-  document.getElementById('single-reason').textContent = flags.length > 0 ? flags[0].reason : 'See narrative below';
-  document.getElementById('single-action').textContent = 'See AI narrative below';
-
-  try {
-    const narrative = await fetchNarrative(d, score, tier, flags);
-    document.getElementById('single-narrative-text').textContent = narrative;
-  } catch(e) {
-    document.getElementById('single-narrative-text').textContent = 'Could not generate narrative: ' + e.message;
-  }
-  document.getElementById('analyse-btn').disabled = false;
-}
-
-async function fetchNarrative(d, score, tier, flags) {
-  const flagSummary = flags.length > 0 ? 'RED FLAGS: ' + flags.map(f => f.metric+' — '+f.reason).join('; ') : 'No red flags.';
-  const resp = await fetch(API_ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-opus-4-5',
-      max_tokens: 280,
-      system: 'You are a senior retention analyst for an EdTech K-12 company. Write a 3-sentence retention narrative: (1) what the data says right now, (2) the most likely root cause, (3) the single most important action this week. Be specific. Use the actual numbers.',
-      messages: [{ role: 'user', content:
-        'Risk Score: '+score+'/100. Tier: '+tier+'. '+flagSummary+'\n'+
-        'Data: pending dues '+d.pending_dues_pct+'%, usage '+d.product_usage+
-        ', hardware '+d.hardware_pct+'%, trainings '+d.training_total+'/4'+
-        ', last training '+d.days_since_last_training+' days ago'+
-        ', teacher attendance '+d.teacher_attendance_last+'%'+
-        ', open tickets '+d.open_tickets_count+' (oldest '+d.oldest_ticket_age+' days)'+
-        ', NPS '+d.nps_latest+' (prev '+d.nps_previous+')'+
-        ', student performance '+d.student_performance_pct+'%'+
-        ', face change: '+d.face_change+', school size: '+d.school_size+' students.'
-      }],
-    }),
-  });
-  const raw = await resp.json();
-  return raw.content[0].text;
-}
-
-// ── CSV ───────────────────────────────────────────────────────
-let allSchools = [], currentFilter = 'all', currentSort = 'score_desc', selectedRow = null;
-
-function handleDrop(e) {
-  e.preventDefault();
-  document.getElementById('upload-area').classList.remove('dragover');
-  if (e.dataTransfer.files[0]) processCSVFile(e.dataTransfer.files[0]);
-}
-function handleCSVUpload(e) { if (e.target.files[0]) processCSVFile(e.target.files[0]); }
-
-function processCSVFile(file) {
-  const reader = new FileReader();
-  reader.onload = e => {
-    const rows = e.target.result.trim().split('\n');
-    const headers = rows[0].split(',').map(h => h.trim());
-    const schools = rows.slice(1).map(row => {
-      const obj = {}; row.split(',').forEach((v,i) => { obj[headers[i]] = v.trim(); }); return obj;
-    }).filter(s => s.school_name);
-    scoreAllSchools(schools);
-  };
-  reader.readAsText(file);
-}
-
-function scoreAllSchools(schools) {
-  document.getElementById('processing-bar').classList.add('visible');
-  document.getElementById('csv-results').style.display = 'none';
-  allSchools = schools.map((s, i) => {
-    const score = calculateRiskScore(s);
-    const flags = evaluateRedFlags(s);
-    const tier  = flags.length > 0 ? 'Red' : getRiskTier(score);
-    document.getElementById('progress-fill').style.width = Math.round(((i+1)/schools.length)*100)+'%';
-    document.getElementById('processing-text').textContent = 'Scoring '+(i+1)+' of '+schools.length+' schools...';
-    return { ...s, score, flags, tier };
-  });
-  document.getElementById('processing-bar').classList.remove('visible');
-  document.getElementById('csv-results').style.display = 'block';
-  renderTable();
-}
-
-function setFilter(f) {
-  currentFilter = f;
-  ['all','red','amber','green'].forEach(x => document.getElementById('filter-'+x).classList.remove('active'));
-  document.getElementById('filter-'+f.toLowerCase()).classList.add('active');
-  renderTable();
-}
-function setSortAndRender(s) { currentSort = s; renderTable(); }
-
-function renderTable() {
-  let schools = currentFilter === 'all' ? [...allSchools] : allSchools.filter(s => s.tier === currentFilter);
-  schools.sort((a,b) =>
-    currentSort === 'score_desc' ? b.score-a.score :
-    currentSort === 'score_asc'  ? a.score-b.score :
-    currentSort === 'name_asc'   ? a.school_name.localeCompare(b.school_name) :
-    b.flags.length-a.flags.length);
-  const red=allSchools.filter(s=>s.tier==='Red').length, amber=allSchools.filter(s=>s.tier==='Amber').length, green=allSchools.filter(s=>s.tier==='Green').length;
-  document.getElementById('results-count').textContent = schools.length+' schools — '+red+' Red, '+amber+' Amber, '+green+' Green';
-  const um = { high:'High', medium:'Medium', low:'Low', none:'None' };
-  document.getElementById('schools-tbody').innerHTML = schools.map(s => {
-    const idx = allSchools.indexOf(s);
-    return '<tr onclick="openDeepDive('+idx+', this)" id="row-'+idx+'">' +
-      '<td><div class="td-school">'+s.school_name+'</div></td>' +
-      '<td><span class="score-cell '+s.tier+'">'+s.score+'</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:'+s.score+'%;background:'+colorFor(s.score)+'"></div></div></td>' +
-      '<td><span class="tier-pill '+s.tier+'">&#9679; '+s.tier+'</span></td>' +
-      '<td>'+(s.flags.length > 0 ? '<span class="flag-count">'+s.flags.length+' flag'+(s.flags.length>1?'s':'')+'</span>' : '<span style="color:#aaa;font-size:12px">—</span>')+'</td>' +
-      '<td>'+s.pending_dues_pct+'%</td><td>'+(um[s.product_usage]||s.product_usage)+'</td><td>'+s.hardware_pct+'%</td><td>'+s.training_total+'/4</td><td>'+s.school_size+'</td></tr>';
-  }).join('');
-}
-
-async function openDeepDive(idx, rowEl) {
-  if (selectedRow) selectedRow.classList.remove('selected');
-  rowEl.classList.add('selected'); selectedRow = rowEl;
-  const s = allSchools[idx];
-  const dd = document.getElementById('deep-dive');
-  dd.classList.add('visible');
-  document.getElementById('dd-title').textContent = s.school_name + ' — Deep Dive';
-  document.getElementById('dd-metrics').innerHTML = [
-    {label:'Risk Score', value:s.score+' / 100'}, {label:'Risk Tier', value:s.tier},
-    {label:'Pending Dues', value:s.pending_dues_pct+'%'}, {label:'Product Usage', value:s.product_usage},
-    {label:'Hardware', value:s.hardware_pct+'%'}, {label:'Trainings Done', value:s.training_total+' / 4'},
-    {label:'Last Training', value:s.days_since_last_training+' days ago'}, {label:'Open Tickets', value:s.open_tickets_count},
-    {label:'NPS', value:s.nps_latest+' / 10'}, {label:'Student Perf', value:s.student_performance_pct+'%'},
-    {label:'School Size', value:s.school_size+' students'}, {label:'Face Change', value:s.face_change},
-  ].map(m => '<div class="dd-metric"><div class="dd-metric-label">'+m.label+'</div><div class="dd-metric-value">'+m.value+'</div></div>').join('');
-  document.getElementById('dd-flags').innerHTML = s.flags.length > 0
-    ? '<div class="flags-title" style="margin-bottom:8px">&#9876; Red Flags</div>'+s.flags.map(f=>'<div class="flag-item"><div class="flag-metric">'+f.metric+'</div><div class="flag-reason">'+f.reason+'</div></div>').join('')
-    : '';
-  dd.scrollIntoView({ behavior:'smooth', block:'start' });
-  document.getElementById('dd-narrative').textContent = 'Generating AI narrative for '+s.school_name+'...';
-  try {
-    document.getElementById('dd-narrative').textContent = await fetchNarrative(s, s.score, s.tier, s.flags);
-  } catch(e) {
-    document.getElementById('dd-narrative').textContent = 'Could not generate narrative: '+e.message;
-  }
-}
-
-function closeDeepDive() {
-  document.getElementById('deep-dive').classList.remove('visible');
-  if (selectedRow) { selectedRow.classList.remove('selected'); selectedRow = null; }
-}
-
-// ── SAMPLE CSV DOWNLOAD ───────────────────────────────────────
-function downloadSample() {
-  const csv = `school_name,pending_dues_pct,product_usage,hardware_pct,training_total,days_since_last_training,teacher_attendance_last,teacher_attendance_previous,open_tickets_count,oldest_ticket_age,nps_latest,nps_previous,student_performance_pct,face_change,days_since_face_change_visit,school_size
-St. Marys High School,15,high,90,4,20,85,80,1,5,8,8,72,no,0,650
-Delhi Public School,20,medium,75,3,40,78,80,2,10,7,7,68,no,0,820
-Kendriya Vidyalaya,80,low,60,2,55,65,70,4,20,5,6,60,no,0,410
-Loyola School,10,high,95,4,15,90,88,0,0,9,9,78,no,0,980
-DAV Public School,60,none,45,1,100,55,60,8,50,4,4,55,yes,20,350
-Holy Cross School,35,medium,70,3,30,75,72,2,8,7,8,65,no,0,520
-Vidya Bharati School,85,low,30,1,95,60,55,5,48,3,4,48,no,0,280
-St. Xaviers School,25,high,88,4,25,82,85,1,3,8,7,74,no,0,740
-Army Public School,45,medium,65,2,60,70,75,3,35,6,7,62,yes,10,430
-Little Flower School,70,none,40,0,999,50,45,7,55,4,3,52,yes,25,190`;
-  const blob = new Blob([csv], {type:'text/csv'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'sample_schools.csv';
-  a.click();
-}
-
-// ── DEMO DATA ────────────────────────────────────────────────
-function loadDemoData() {
-  const demo = {
-    pending_dues_pct: '65', product_usage: 'low', hardware_pct: '45',
-    training_total: '1', days_since_last_training: '95',
-    teacher_attendance_last: '60', teacher_attendance_previous: '65',
-    open_tickets_count: '5', oldest_ticket_age: '50',
-    nps_latest: '4', nps_previous: '3',
-    student_performance_pct: '55', face_change: 'yes',
-    days_since_face_change_visit: '18', school_size: '420',
-  };
-  Object.entries(demo).forEach(([id, val]) => {
-    const el = document.getElementById(id);
-    if (el) el.value = val;
-  });
-  // Scroll to top of form
-  document.querySelector('.form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// ── GOOGLE SHEET SYNC ────────────────────────────────────────
-let sheetSchools = [], sheetFilter = 'all', sheetSort = 'score_desc', sheetSelectedRow = null;
-
-function openTemplate() {
-  // Download the CSV template — user imports it into Google Sheets
-  const headers = 'school_name,pending_dues_pct,product_usage,hardware_pct,training_total,days_since_last_training,teacher_attendance_last,teacher_attendance_previous,open_tickets_count,oldest_ticket_age,nps_latest,nps_previous,student_performance_pct,face_change,days_since_face_change_visit,school_size';
-  const example = 'Your School Name,20,high,80,3,30,85,80,1,5,8,7,70,no,0,500';
-  const csv = headers + '\n' + example;
-  const blob = new Blob([csv], {type:'text/csv'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'school_retention_template.csv';
-  a.click();
-  // Show instructions
-  const errEl = document.getElementById('sheet-error');
-  errEl.style.background = '#e8f8e8';
-  errEl.style.color = '#1e7e34';
-  errEl.style.border = '1px solid #bbf0c8';
-  errEl.textContent = 'Template downloaded. Steps: (1) Open Google Sheets → File → Import → Upload the CSV. (2) Add your schools. (3) Share → Anyone with link can view. (4) Paste the Sheet URL above.';
-  errEl.classList.add('visible');
-}
-
-function extractSheetId(url) {
-  const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-  return match ? match[1] : null;
-}
-
-async function analyseFromSheet() {
-  const url = document.getElementById('sheet-url').value.trim();
-  const errEl = document.getElementById('sheet-error');
-  errEl.classList.remove('visible');
-
-  if (!url) {
-    errEl.textContent = 'Please paste a Google Sheet URL.';
-    errEl.classList.add('visible');
-    return;
-  }
-
-  const sheetId = extractSheetId(url);
-  if (!sheetId) {
-    errEl.textContent = 'Could not find a Sheet ID in that URL. Make sure you paste the full Google Sheets URL.';
-    errEl.classList.add('visible');
-    return;
-  }
-
-  document.getElementById('sheet-btn').disabled = true;
-  document.getElementById('sheet-processing').classList.add('visible');
-  document.getElementById('sheet-results').style.display = 'none';
-  document.getElementById('sheet-progress-fill').style.width = '10%';
-  document.getElementById('sheet-processing-text').textContent = 'Fetching sheet data...';
-
-  try {
-    // Use Google Sheets CSV export URL (works for public sheets)
-    const csvUrl = 'https://docs.google.com/spreadsheets/d/' + sheetId + '/export?format=csv&gid=0';
-    const resp = await fetch(csvUrl);
-
-    if (!resp.ok) {
-      throw new Error('Could not access the sheet. Make sure sharing is set to "Anyone with the link can view".');
-    }
-
-    const text = await resp.text();
-    document.getElementById('sheet-progress-fill').style.width = '40%';
-    document.getElementById('sheet-processing-text').textContent = 'Parsing school data...';
-
-    const rows = text.trim().split('\n');
-    const headers = rows[0].split(',').map(h => h.replace(/"/g,'').trim());
-    const schools = rows.slice(1).map(row => {
-      // Handle quoted CSV values
-      const vals = row.match(/(".*?"|[^,]+)(?=,|$)/g) || row.split(',');
-      const obj = {};
-      headers.forEach((h, i) => { obj[h] = (vals[i]||'').replace(/"/g,'').trim(); });
-      return obj;
-    }).filter(s => s.school_name && s.school_name.length > 0);
-
-    if (schools.length === 0) {
-      throw new Error('No school data found. Make sure your Sheet has the correct column headers and at least one data row.');
-    }
-
-    document.getElementById('sheet-progress-fill').style.width = '60%';
-    document.getElementById('sheet-processing-text').textContent = 'Scoring ' + schools.length + ' schools...';
-
-    sheetSchools = schools.map((s, i) => {
-      const score = calculateRiskScore(s);
-      const flags = evaluateRedFlags(s);
-      const tier  = flags.length > 0 ? 'Red' : getRiskTier(score);
-      const pct   = Math.round(60 + ((i+1)/schools.length)*40);
-      document.getElementById('sheet-progress-fill').style.width = pct + '%';
-      return { ...s, score, flags, tier };
-    });
-
-    document.getElementById('sheet-processing').classList.remove('visible');
-    document.getElementById('sheet-results').style.display = 'block';
-    renderSheetTable();
-
-  } catch(e) {
-    document.getElementById('sheet-processing').classList.remove('visible');
-    errEl.textContent = e.message;
-    errEl.classList.add('visible');
-  }
-
-  document.getElementById('sheet-btn').disabled = false;
-}
-
-function setSheetFilter(f) {
-  sheetFilter = f;
-  ['all','red','amber','green'].forEach(x => {
-    const b = document.getElementById('sf-'+x); if(b) b.classList.remove('active');
-  });
-  const ab = document.getElementById('sf-'+f.toLowerCase()); if(ab) ab.classList.add('active');
-  renderSheetTable();
-}
-
-function setSheetSort(s) { sheetSort = s; renderSheetTable(); }
-
-function renderSheetTable() {
-  let schools = sheetFilter === 'all' ? [...sheetSchools] : sheetSchools.filter(s => s.tier === sheetFilter);
-  schools.sort((a,b) =>
-    sheetSort === 'score_desc' ? b.score-a.score :
-    sheetSort === 'score_asc'  ? a.score-b.score :
-    sheetSort === 'name_asc'   ? a.school_name.localeCompare(b.school_name) :
-    b.flags.length-a.flags.length
-  );
-  const red=sheetSchools.filter(s=>s.tier==='Red').length;
-  const amber=sheetSchools.filter(s=>s.tier==='Amber').length;
-  const green=sheetSchools.filter(s=>s.tier==='Green').length;
-  document.getElementById('sheet-results-count').textContent = schools.length+' schools — '+red+' Red, '+amber+' Amber, '+green+' Green';
-  const um = { high:'High', medium:'Medium', low:'Low', none:'None' };
-  document.getElementById('sheet-tbody').innerHTML = schools.map(s => {
-    const idx = sheetSchools.indexOf(s);
-    return '<tr onclick="openSheetDeepDive('+idx+', this)">' +
-      '<td><div class="td-school">'+s.school_name+'</div></td>' +
-      '<td><span class="score-cell '+s.tier+'">'+s.score+'</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:'+s.score+'%;background:'+colorFor(s.score)+'"></div></div></td>' +
-      '<td><span class="tier-pill '+s.tier+'">&#9679; '+s.tier+'</span></td>' +
-      '<td>'+(s.flags.length > 0 ? '<span class="flag-count">'+s.flags.length+' flag'+(s.flags.length>1?'s':'')+'</span>' : '<span style="color:#aaa;font-size:12px">—</span>')+'</td>' +
-      '<td>'+s.pending_dues_pct+'%</td><td>'+(um[s.product_usage]||s.product_usage)+'</td>' +
-      '<td>'+s.hardware_pct+'%</td><td>'+s.training_total+'/4</td><td>'+s.school_size+'</td></tr>';
-  }).join('');
-}
-
-async function openSheetDeepDive(idx, rowEl) {
-  if (sheetSelectedRow) sheetSelectedRow.classList.remove('selected');
-  rowEl.classList.add('selected'); sheetSelectedRow = rowEl;
-  const s = sheetSchools[idx];
-  const dd = document.getElementById('sheet-deep-dive');
-  dd.classList.add('visible');
-  document.getElementById('sheet-dd-title').textContent = s.school_name + ' — Deep Dive';
-  document.getElementById('sheet-dd-metrics').innerHTML = [
-    {label:'Risk Score',value:s.score+' / 100'},{label:'Risk Tier',value:s.tier},
-    {label:'Pending Dues',value:s.pending_dues_pct+'%'},{label:'Product Usage',value:s.product_usage},
-    {label:'Hardware',value:s.hardware_pct+'%'},{label:'Trainings Done',value:s.training_total+' / 4'},
-    {label:'Last Training',value:s.days_since_last_training+' days ago'},{label:'Open Tickets',value:s.open_tickets_count},
-    {label:'NPS',value:s.nps_latest+' / 10'},{label:'Student Perf',value:s.student_performance_pct+'%'},
-    {label:'School Size',value:s.school_size+' students'},{label:'Face Change',value:s.face_change},
-  ].map(m=>'<div class="dd-metric"><div class="dd-metric-label">'+m.label+'</div><div class="dd-metric-value">'+m.value+'</div></div>').join('');
-  document.getElementById('sheet-dd-flags').innerHTML = s.flags.length > 0
-    ? '<div class="flags-title" style="margin-bottom:8px">&#9876; Red Flags</div>'+
-      s.flags.map(f=>'<div class="flag-item"><div class="flag-metric">'+f.metric+'</div><div class="flag-reason">'+f.reason+'</div></div>').join('')
-    : '';
-  dd.scrollIntoView({ behavior:'smooth', block:'start' });
-  document.getElementById('sheet-dd-narrative').textContent = 'Generating AI narrative for '+s.school_name+'...';
-  try {
-    document.getElementById('sheet-dd-narrative').textContent = await fetchNarrative(s, s.score, s.tier, s.flags);
-  } catch(e) {
-    document.getElementById('sheet-dd-narrative').textContent = 'Could not generate narrative: '+e.message;
-  }
-}
-
-function closeSheetDeepDive() {
-  document.getElementById('sheet-deep-dive').classList.remove('visible');
-  if (sheetSelectedRow) { sheetSelectedRow.classList.remove('selected'); sheetSelectedRow = null; }
-}
-
-</script>
-
-
 <!-- GOOGLE SHEET TAB -->
 <div class="content" id="content-sheet" style="display:none">
-
   <div class="sheet-card">
     <h2>Analyse schools directly from your Google Sheet</h2>
-    <p>Paste the link to your Google Sheet below. The tool will pull your school data and run the full risk analysis — no CSV download needed. Your Sheet must be set to "Anyone with the link can view".</p>
-
+    <p>Paste your public Google Sheet URL below. The tool pulls your data and scores all schools instantly &#8212; no CSV download needed.</p>
     <div class="sheet-steps">
       <div class="sheet-step">
         <div class="sheet-step-num">1</div>
-        <div class="sheet-step-title">Set up your Sheet</div>
-        <div class="sheet-step-desc">Use the template below. Column headers must match exactly. One school per row.</div>
+        <div class="sheet-step-title">Get the template</div>
+        <div class="sheet-step-desc">Open our pre-filled Google Sheet with 40 sample schools, or download the CSV and import it.</div>
       </div>
       <div class="sheet-step">
         <div class="sheet-step-num">2</div>
-        <div class="sheet-step-title">Share it publicly</div>
-        <div class="sheet-step-desc">In Google Sheets: Share &rarr; Anyone with the link &rarr; Viewer. Copy the link.</div>
+        <div class="sheet-step-title">Make it public</div>
+        <div class="sheet-step-desc">In Google Sheets: Share &#8594; Anyone with the link &#8594; Viewer. Copy the URL.</div>
       </div>
       <div class="sheet-step">
         <div class="sheet-step-num">3</div>
         <div class="sheet-step-title">Paste and analyse</div>
-        <div class="sheet-step-desc">Paste the Sheet URL below and click Analyse. All schools are scored instantly.</div>
+        <div class="sheet-step-desc">Paste the Sheet URL below and click Analyse. All schools are scored in seconds.</div>
       </div>
     </div>
-
-    <div style="margin-bottom:14px">
-      <a class="sheet-template-btn" onclick="openTemplate()">
-        &#128196; Open Google Sheet Template
+    <div style="margin-bottom:14px;display:flex;align-items:center;flex-wrap:wrap;gap:8px">
+      <a class="sheet-link-btn" href="https://docs.google.com/spreadsheets/d/1VbpqGAJlCnKgdarKvScRf-r4pv8EjyNPzErmOguDIVk/copy" target="_blank">
+        &#128196; Open Google Sheet Template (make a copy)
       </a>
-      <span style="font-size:11px;color:#aaa;margin-left:10px">Make a copy of this template and fill in your school data</span>
+      <button class="sheet-dl-btn" onclick="downloadSample()">&#8595; Download CSV instead</button>
     </div>
-
     <div class="sheet-input-row">
-      <input type="text" class="sheet-input" id="sheet-url" placeholder="Paste your Google Sheet URL here — e.g. https://docs.google.com/spreadsheets/d/...">
+      <input type="text" class="sheet-input" id="sheet-url" placeholder="Paste your Google Sheet URL here &#8212; e.g. https://docs.google.com/spreadsheets/d/...">
       <button class="sheet-btn" id="sheet-btn" onclick="analyseFromSheet()">Analyse Sheet</button>
     </div>
-    <div class="sheet-error" id="sheet-error"></div>
-
+    <div class="sheet-msg" id="sheet-msg"></div>
     <div style="font-size:11px;color:#aaa;line-height:1.6;margin-top:8px">
       &#128274; Your data is never stored. It is fetched, scored in your browser, and discarded when you close the tab.
     </div>
   </div>
-
   <div class="processing-bar" id="sheet-processing">
     <div class="processing-text" id="sheet-processing-text">Fetching sheet data...</div>
     <div class="progress-track"><div class="progress-fill" id="sheet-progress-fill" style="width:0%"></div></div>
   </div>
-
   <div id="sheet-results" style="display:none">
     <div class="csv-card" style="padding:16px 24px">
       <div class="filter-row">
@@ -965,12 +562,7 @@ function closeSheetDeepDive() {
       </div>
       <div class="table-wrap">
         <table>
-          <thead>
-            <tr>
-              <th>School</th><th>Score</th><th>Tier</th><th>Red Flags</th>
-              <th>Pending Dues</th><th>Product Usage</th><th>Hardware</th><th>Training</th><th>Size</th>
-            </tr>
-          </thead>
+          <thead><tr><th>School</th><th>Score</th><th>Tier</th><th>Red Flags</th><th>Pending Dues</th><th>Product Usage</th><th>Hardware</th><th>Training</th><th>Size</th></tr></thead>
           <tbody id="sheet-tbody"></tbody>
         </table>
       </div>
@@ -985,222 +577,63 @@ function closeSheetDeepDive() {
       <div class="dd-narrative" id="sheet-dd-narrative">Click a school row to generate the AI narrative.</div>
     </div>
   </div>
-
 </div>
 
 <!-- GUIDE TAB -->
 <div class="content" id="content-guide" style="display:none">
-
   <div class="guide-full">
     <div class="guide-section-title">How to use this tool</div>
     <div class="guide-grid">
       <div class="guide-card">
         <h3>Single School Analysis</h3>
-        <div class="guide-step"><div class="step-circle">1</div><div class="step-content"><div class="step-title">Fill in the metrics form</div><div class="step-desc">Enter values for all 10 metrics on the left panel. Every field has a hint showing what to enter and the valid range. Leave fields at 0 if data is unavailable.</div></div></div>
-        <div class="guide-step"><div class="step-circle">2</div><div class="step-content"><div class="step-title">Click Analyse School Risk</div><div class="step-desc">The tool instantly calculates a risk score using domain-weighted scoring. No AI call is needed for the score — it runs on your browser.</div></div></div>
-        <div class="guide-step"><div class="step-circle">3</div><div class="step-content"><div class="step-title">Read the risk card</div><div class="step-desc">You see the score (0-100), tier (Red/Amber/Green), any red flags triggered, and a metric breakdown bar chart showing what is driving the score.</div></div></div>
-        <div class="guide-step"><div class="step-circle">4</div><div class="step-content"><div class="step-title">Read the AI narrative</div><div class="step-desc">Claude writes a 3-sentence narrative: current situation, root cause, and one specific action for the field team this week.</div></div></div>
+        <div class="guide-step"><div class="step-circle">1</div><div class="step-content"><div class="step-title">Load demo or fill the form</div><div class="step-desc">Click Load Demo Data for an instant example, or fill in your own school metrics. Every field shows the valid range and what to enter.</div></div></div>
+        <div class="guide-step"><div class="step-circle">2</div><div class="step-content"><div class="step-title">Click Analyse School Risk</div><div class="step-desc">The risk score is calculated instantly in your browser using domain-weighted scoring &#8212; no AI call needed for the score itself.</div></div></div>
+        <div class="guide-step"><div class="step-circle">3</div><div class="step-content"><div class="step-title">Read the risk card and breakdown</div><div class="step-desc">See the score, tier, any red flags triggered, and a bar chart showing exactly which metrics are driving the risk.</div></div></div>
+        <div class="guide-step"><div class="step-circle">4</div><div class="step-content"><div class="step-title">Get the AI narrative</div><div class="step-desc">Claude writes a 3-sentence narrative: current situation, root cause, and one specific action for the field team this week.</div></div></div>
       </div>
       <div class="guide-card">
-        <h3>Batch CSV Analysis</h3>
-        <div class="guide-step"><div class="step-circle">1</div><div class="step-content"><div class="step-title">Download the sample CSV</div><div class="step-desc">Click "Download Sample CSV" on the Batch Upload tab to get a template with the correct column headers and 10 example schools pre-filled.</div></div></div>
-        <div class="guide-step"><div class="step-circle">2</div><div class="step-content"><div class="step-title">Fill in your school data</div><div class="step-desc">Replace the sample rows with your real school data. Keep the column headers exactly as they are. Save as .csv format.</div></div></div>
-        <div class="guide-step"><div class="step-circle">3</div><div class="step-content"><div class="step-title">Upload the CSV</div><div class="step-desc">Drag and drop the file or click to browse. All schools are scored instantly — no API calls needed for scoring, so it works on 100 schools in seconds.</div></div></div>
-        <div class="guide-step"><div class="step-circle">4</div><div class="step-content"><div class="step-title">Filter, sort, and deep dive</div><div class="step-desc">Filter by Red/Amber/Green tier. Sort by highest risk, most red flags, or school name. Click any row to generate an AI deep-dive narrative for that school.</div></div></div>
+        <h3>Batch Analysis (CSV or Google Sheet)</h3>
+        <div class="guide-step"><div class="step-circle">1</div><div class="step-content"><div class="step-title">Get the template</div><div class="step-desc">Download the 40-school CSV sample, or open the Google Sheet template and make a copy. Both have the correct column structure.</div></div></div>
+        <div class="guide-step"><div class="step-circle">2</div><div class="step-content"><div class="step-title">Fill in your school data</div><div class="step-desc">Replace the sample rows with real data. Keep column headers exactly as they are.</div></div></div>
+        <div class="guide-step"><div class="step-circle">3</div><div class="step-content"><div class="step-title">Upload CSV or paste Sheet URL</div><div class="step-desc">For CSV: use the Batch Upload tab. For Google Sheet: share as Anyone with link can view, then paste the URL in the Google Sheet Sync tab.</div></div></div>
+        <div class="guide-step"><div class="step-circle">4</div><div class="step-content"><div class="step-title">Filter, sort and deep dive</div><div class="step-desc">Filter by Red/Amber/Green. Sort by risk. Click any row to generate an AI narrative for that school.</div></div></div>
       </div>
     </div>
   </div>
-
   <div class="guide-full">
     <div class="guide-section-title">Risk Tiers Explained</div>
     <div class="tier-explain">
-      <div class="tier-box Red">
-        <div class="tier-box-label">&#9679; Red — High Risk</div>
-        <div class="tier-box-score">Score &ge; 65 OR any red flag</div>
-        <div class="tier-box-desc">Immediate intervention required. Field visit within 48-72 hours. Account likely to churn without action.</div>
-      </div>
-      <div class="tier-box Amber">
-        <div class="tier-box-label">&#9679; Amber — Watch</div>
-        <div class="tier-box-score">Score 35–64, no red flags</div>
-        <div class="tier-box-desc">Early warning signals present. Schedule a proactive check-in within 2 weeks. Monitor closely at renewal.</div>
-      </div>
-      <div class="tier-box Green">
-        <div class="tier-box-label">&#9679; Green — Healthy</div>
-        <div class="tier-box-score">Score &lt; 35, no red flags</div>
-        <div class="tier-box-desc">School is engaged and on track. Maintain regular cadence. Good candidate for upsell or referral.</div>
-      </div>
+      <div class="tier-box Red"><div class="tier-box-label">&#9679; Red &#8212; High Risk</div><div class="tier-box-score">Score &ge; 65 OR any red flag</div><div class="tier-box-desc">Immediate intervention required. Field visit within 48&#8211;72 hours. Account likely to churn without action.</div></div>
+      <div class="tier-box Amber"><div class="tier-box-label">&#9679; Amber &#8212; Watch</div><div class="tier-box-score">Score 35&#8211;64, no red flags</div><div class="tier-box-desc">Early warning signals. Proactive check-in within 2 weeks. Monitor closely at renewal.</div></div>
+      <div class="tier-box Green"><div class="tier-box-label">&#9679; Green &#8212; Healthy</div><div class="tier-box-score">Score &lt; 35, no red flags</div><div class="tier-box-desc">School is engaged and on track. Maintain regular cadence. Good candidate for upsell or referral.</div></div>
     </div>
   </div>
-
   <div class="guide-full">
     <div class="guide-section-title">Metric Definitions &amp; Weights</div>
-    <p style="font-size:13px;color:#888;margin-bottom:16px;line-height:1.6">The risk score is calculated using a weighted model. Higher weight = more impact on the final score. A red flag on any metric forces the tier to Red regardless of the score.</p>
+    <p style="font-size:13px;color:#888;margin-bottom:16px;line-height:1.6">Higher weight = more impact on score. A red flag on any metric forces the tier to Red regardless of the calculated score.</p>
     <table class="metric-table">
-      <thead>
-        <tr>
-          <th>Metric</th>
-          <th>Weight</th>
-          <th>What to enter</th>
-          <th>Good</th>
-          <th>Warn</th>
-          <th>Red Flag Condition</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Metric</th><th>Weight</th><th>What to enter</th><th>Good</th><th>Warn</th><th>Red Flag</th></tr></thead>
       <tbody>
-        <tr>
-          <td><div class="metric-name">Pending Dues %</div><div style="font-size:11px;color:#aaa">Financial health signal</div></td>
-          <td><span class="metric-weight w-high">35%</span></td>
-          <td>% of total annual billing that is currently unpaid.<br><span style="color:#aaa">Number 0–100. E.g. if ₹3L of ₹10L is unpaid, enter 30.</span></td>
-          <td style="color:#1e7e34">&lt; 25%</td>
-          <td style="color:#b7770d">50–75%</td>
-          <td><span class="flag-pill">&ge; 75%</span></td>
-        </tr>
-        <tr>
-          <td><div class="metric-name">Product Usage</div><div style="font-size:11px;color:#aaa">Core adoption signal</div></td>
-          <td><span class="metric-weight w-high">30%</span></td>
-          <td>Overall product usage level observed by the field team.<br><span style="color:#aaa">Select: High / Medium / Low / None</span></td>
-          <td style="color:#1e7e34">High</td>
-          <td style="color:#b7770d">Low</td>
-          <td><span class="flag-pill">None</span></td>
-        </tr>
-        <tr>
-          <td><div class="metric-name">Hardware — % Classes Equipped</div><div style="font-size:11px;color:#aaa">Infrastructure readiness</div></td>
-          <td><span class="metric-weight w-med">10%</span></td>
-          <td>% of classrooms that have hardware installed and functional.<br><span style="color:#aaa">Number 0–100. E.g. 18 of 30 classes = 60.</span></td>
-          <td style="color:#1e7e34">&gt; 75%</td>
-          <td style="color:#b7770d">&lt; 50%</td>
-          <td><span class="flag-pill">&lt; 25%</span></td>
-        </tr>
-        <tr>
-          <td><div class="metric-name">Training — Total Done</div><div style="font-size:11px;color:#aaa">Teacher enablement</div></td>
-          <td><span class="metric-weight w-med">10%</span><div style="font-size:10px;color:#aaa">(combined with days since)</div></td>
-          <td>Number of training sessions conducted so far this year.<br><span style="color:#aaa">Number 0–4. Tool assumes 4 sessions promised per year.</span></td>
-          <td style="color:#1e7e34">4 / 4</td>
-          <td style="color:#b7770d">1 / 4</td>
-          <td><span class="flag-pill">0 ever</span></td>
-        </tr>
-        <tr>
-          <td><div class="metric-name">Days Since Last Training</div><div style="font-size:11px;color:#aaa">Training recency</div></td>
-          <td><span style="font-size:11px;color:#aaa">Part of Training weight</span></td>
-          <td>Number of days since the most recent training session.<br><span style="color:#aaa">Number &ge; 0. Enter 999 if no training has ever happened.</span></td>
-          <td style="color:#1e7e34">&le; 45 days</td>
-          <td style="color:#b7770d">&gt; 45 days</td>
-          <td><span class="flag-pill">&ge; 90 days</span></td>
-        </tr>
-        <tr>
-          <td><div class="metric-name">Teacher Attendance — Last Training %</div><div style="font-size:11px;color:#aaa">Staff engagement</div></td>
-          <td><span class="metric-weight w-low">2%</span></td>
-          <td>% of teachers who attended the most recent training session.<br><span style="color:#aaa">Number 0–100.</span></td>
-          <td style="color:#1e7e34">&ge; 75%</td>
-          <td style="color:#b7770d">&lt; 75%</td>
-          <td><span class="flag-pill">2 consecutive &lt; 75%</span></td>
-        </tr>
-        <tr>
-          <td><div class="metric-name">Teacher Attendance — Previous Training %</div><div style="font-size:11px;color:#aaa">Used for red flag only</div></td>
-          <td><span style="font-size:11px;color:#aaa">Used for red flag</span></td>
-          <td>% of teachers who attended the training session before the last one.<br><span style="color:#aaa">Number 0–100. Enter same as last if only one training done.</span></td>
-          <td style="color:#1e7e34">&ge; 75%</td>
-          <td style="color:#b7770d">&lt; 75%</td>
-          <td><span class="flag-pill">Both &lt; 75%</span></td>
-        </tr>
-        <tr>
-          <td><div class="metric-name">Open Tickets — Count</div><div style="font-size:11px;color:#aaa">Service health</div></td>
-          <td><span class="metric-weight w-low">5%</span></td>
-          <td>Total number of currently open (unresolved) service tickets.<br><span style="color:#aaa">Number &ge; 0.</span></td>
-          <td style="color:#1e7e34">0</td>
-          <td style="color:#b7770d">2+</td>
-          <td><span class="flag-pill">&ge; 10 tickets</span></td>
-        </tr>
-        <tr>
-          <td><div class="metric-name">Oldest Open Ticket (days)</div><div style="font-size:11px;color:#aaa">Service resolution speed</div></td>
-          <td><span style="font-size:11px;color:#aaa">Used for red flag</span></td>
-          <td>Age in days of the oldest currently open ticket.<br><span style="color:#aaa">Number &ge; 0. Enter 0 if no open tickets.</span></td>
-          <td style="color:#1e7e34">&le; 7 days</td>
-          <td style="color:#b7770d">&gt; 14 days</td>
-          <td><span class="flag-pill">&gt; 45 days</span></td>
-        </tr>
-        <tr>
-          <td><div class="metric-name">NPS — Latest</div><div style="font-size:11px;color:#aaa">Satisfaction score</div></td>
-          <td><span class="metric-weight w-low">5%</span></td>
-          <td>Most recent Net Promoter Score given by the school principal or admin.<br><span style="color:#aaa">Number 0–10.</span></td>
-          <td style="color:#1e7e34">&ge; 8</td>
-          <td style="color:#b7770d">&lt; 5</td>
-          <td><span class="flag-pill">2 consecutive &lt; 5</span></td>
-        </tr>
-        <tr>
-          <td><div class="metric-name">NPS — Previous</div><div style="font-size:11px;color:#aaa">Used for red flag only</div></td>
-          <td><span style="font-size:11px;color:#aaa">Used for red flag</span></td>
-          <td>NPS score from the survey before the most recent one.<br><span style="color:#aaa">Number 0–10. Enter same as latest if only one survey done.</span></td>
-          <td style="color:#1e7e34">&ge; 8</td>
-          <td style="color:#b7770d">&lt; 5</td>
-          <td><span class="flag-pill">Both &lt; 5</span></td>
-        </tr>
-        <tr>
-          <td><div class="metric-name">Student Performance Avg %</div><div style="font-size:11px;color:#aaa">Outcome signal</div></td>
-          <td><span class="metric-weight w-low">3%</span></td>
-          <td>Average marks scored by students in the most recent exam across all classes using the product.<br><span style="color:#aaa">Number 0–100.</span></td>
-          <td style="color:#1e7e34">&gt; 70%</td>
-          <td style="color:#b7770d">&lt; 70%</td>
-          <td><span class="flag-pill">&lt; 50%</span></td>
-        </tr>
-        <tr>
-          <td><div class="metric-name">Face Change in Service Team</div><div style="font-size:11px;color:#aaa">Relationship continuity</div></td>
-          <td><span style="font-size:11px;color:#aaa">Red flag only</span></td>
-          <td>Has the assigned field service representative changed recently?<br><span style="color:#aaa">Select: Yes / No</span></td>
-          <td style="color:#1e7e34">No</td>
-          <td style="color:#b7770d">Yes</td>
-          <td><span class="flag-pill">Yes + no visit in 15 days</span></td>
-        </tr>
-        <tr>
-          <td><div class="metric-name">Days Since Face Change Visit</div><div style="font-size:11px;color:#aaa">Used for red flag only</div></td>
-          <td><span style="font-size:11px;color:#aaa">Red flag only</span></td>
-          <td>Days since the new service rep visited the school after the rep change.<br><span style="color:#aaa">Number &ge; 0. Enter 0 if no face change or if visit already done.</span></td>
-          <td style="color:#1e7e34">&le; 7 days</td>
-          <td style="color:#b7770d">&gt; 15 days</td>
-          <td><span class="flag-pill">&gt; 15 days after change</span></td>
-        </tr>
-        <tr>
-          <td><div class="metric-name">School Size (students)</div><div style="font-size:11px;color:#aaa">Prioritisation only</div></td>
-          <td><span style="font-size:11px;color:#aaa">0% — info only</span></td>
-          <td>Total number of enrolled students in the school.<br><span style="color:#aaa">Number &ge; 0. Does not affect score — used for visit prioritisation.</span></td>
-          <td style="color:#1e7e34">Any size</td>
-          <td style="color:#b7770d">—</td>
-          <td><span style="color:#aaa;font-size:11px">No flag</span></td>
-        </tr>
+        <tr><td><div class="metric-name">Pending Dues %</div></td><td><span class="metric-weight w-high">35%</span></td><td>% of annual billing unpaid. E.g. &#8377;3L of &#8377;10L = 30.</td><td style="color:#1e7e34">&lt;25%</td><td style="color:#b7770d">50&#8211;75%</td><td><span class="flag-pill">&ge;75%</span></td></tr>
+        <tr><td><div class="metric-name">Product Usage</div></td><td><span class="metric-weight w-high">30%</span></td><td>Select: High / Medium / Low / None</td><td style="color:#1e7e34">High</td><td style="color:#b7770d">Low</td><td><span class="flag-pill">None</span></td></tr>
+        <tr><td><div class="metric-name">Hardware % Classes</div></td><td><span class="metric-weight w-med">10%</span></td><td>% of classrooms with working hardware (0&#8211;100)</td><td style="color:#1e7e34">&gt;75%</td><td style="color:#b7770d">&lt;50%</td><td><span class="flag-pill">&lt;25%</span></td></tr>
+        <tr><td><div class="metric-name">Training Done</div></td><td><span class="metric-weight w-med">10%</span></td><td>Sessions done this year (0&#8211;4) + days since last session</td><td style="color:#1e7e34">4/4, &le;45 days</td><td style="color:#b7770d">1/4, &gt;45 days</td><td><span class="flag-pill">0 ever or &ge;90 days</span></td></tr>
+        <tr><td><div class="metric-name">Open Tickets</div></td><td><span class="metric-weight w-low">5%</span></td><td>Count of open tickets + age of oldest (days)</td><td style="color:#1e7e34">0 tickets</td><td style="color:#b7770d">2+</td><td><span class="flag-pill">&ge;10 or oldest &gt;45 days</span></td></tr>
+        <tr><td><div class="metric-name">NPS</div></td><td><span class="metric-weight w-low">5%</span></td><td>Latest + previous NPS score (0&#8211;10)</td><td style="color:#1e7e34">&ge;8</td><td style="color:#b7770d">&lt;5</td><td><span class="flag-pill">2 consecutive &lt;5</span></td></tr>
+        <tr><td><div class="metric-name">Student Performance</div></td><td><span class="metric-weight w-low">3%</span></td><td>Average marks % across classes using the product</td><td style="color:#1e7e34">&gt;70%</td><td style="color:#b7770d">&lt;70%</td><td><span class="flag-pill">&lt;50%</span></td></tr>
+        <tr><td><div class="metric-name">Teacher Attendance</div></td><td><span class="metric-weight w-low">2%</span></td><td>% attending last two training sessions</td><td style="color:#1e7e34">&ge;75%</td><td style="color:#b7770d">&lt;75%</td><td><span class="flag-pill">2 consecutive &lt;75%</span></td></tr>
+        <tr><td><div class="metric-name">Face Change</div></td><td><span style="font-size:11px;color:#aaa">Flag only</span></td><td>Yes/No + days since new rep visited</td><td style="color:#1e7e34">No</td><td style="color:#b7770d">Yes</td><td><span class="flag-pill">Yes + no visit &gt;15 days</span></td></tr>
+        <tr><td><div class="metric-name">School Size</div></td><td><span style="font-size:11px;color:#aaa">0% &#8212; info only</span></td><td>Total enrolled students &#8212; for prioritisation only</td><td style="color:#1e7e34">Any</td><td style="color:#b7770d">&#8212;</td><td><span style="color:#aaa;font-size:11px">No flag</span></td></tr>
       </tbody>
     </table>
   </div>
-
-  <div class="guide-full">
-    <div class="guide-section-title">Frequently Asked Questions</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-      <div style="background:#f8f8f8;border-radius:8px;padding:16px">
-        <div style="font-size:13px;font-weight:600;color:#222;margin-bottom:6px">What if I don't have data for some fields?</div>
-        <div style="font-size:12px;color:#666;line-height:1.5">Enter 0 for numeric fields you don't have. For NPS previous, enter the same value as NPS latest. The model will still give a useful score — just less precise.</div>
-      </div>
-      <div style="background:#f8f8f8;border-radius:8px;padding:16px">
-        <div style="font-size:13px;font-weight:600;color:#222;margin-bottom:6px">How is the score calculated?</div>
-        <div style="font-size:12px;color:#666;line-height:1.5">Each metric is normalised to a 0–100 risk score then multiplied by its weight. The weighted scores are summed. Red flags override the tier to Red regardless of the score.</div>
-      </div>
-      <div style="background:#f8f8f8;border-radius:8px;padding:16px">
-        <div style="font-size:13px;font-weight:600;color:#222;margin-bottom:6px">Why does a Green score sometimes show Red?</div>
-        <div style="font-size:12px;color:#666;line-height:1.5">Red flags are independent of the score. A school can score 25 (Green) but still be forced to Red if, say, no training has happened in 90 days. The flag overrides the tier.</div>
-      </div>
-      <div style="background:#f8f8f8;border-radius:8px;padding:16px">
-        <div style="font-size:13px;font-weight:600;color:#222;margin-bottom:6px">Can I change the weights?</div>
-        <div style="font-size:12px;color:#666;line-height:1.5">The weights are currently set based on domain expertise from EdTech operations experience. Future versions will support custom weight configuration and regression-based tuning.</div>
-      </div>
-    </div>
-  </div>
-
 </div>
-
 
 <div class="footer">
   <div class="footer-left">
     <strong>School Retention Risk Analyser</strong><br>
-    Built by Ankit Sourabh Lakra &mdash; Strategy &amp; Operations leader learning to build with AI.<br>
-    Part of a 5-project AI upskilling journey. Weights and red flag logic derived from 8 years of EdTech operations experience.
+    Built by Ankit Sourabh Lakra &#8212; Strategy &amp; Operations leader building with AI.<br>
+    Weights and red flag logic derived from 8 years of EdTech operations experience at scale.
   </div>
   <div class="footer-links">
     <a href="https://www.linkedin.com/in/ankit-sourabh-lakra" target="_blank" class="footer-link">&#128101; LinkedIn</a>
@@ -1208,5 +641,289 @@ function closeSheetDeepDive() {
   </div>
 </div>
 
+<script>
+const SAMPLE_SCHOOLS = [
+  {school_name:"St. Mary\'s Convent School",pending_dues_pct:"43",product_usage:"medium",hardware_pct:"57",training_total:"2",days_since_last_training:"38",teacher_attendance_last:"68",teacher_attendance_previous:"67",open_tickets_count:"4",oldest_ticket_age:"6",nps_latest:"6",nps_previous:"5",student_performance_pct:"63",face_change:"no",days_since_face_change_visit:"0",school_size:"419"},
+  {school_name:"Delhi Public School Ranchi",pending_dues_pct:"37",product_usage:"medium",hardware_pct:"72",training_total:"3",days_since_last_training:"44",teacher_attendance_last:"79",teacher_attendance_previous:"73",open_tickets_count:"1",oldest_ticket_age:"29",nps_latest:"6",nps_previous:"7",student_performance_pct:"66",face_change:"no",days_since_face_change_visit:"0",school_size:"474"},
+  {school_name:"Kendriya Vidyalaya Sector 4",pending_dues_pct:"61",product_usage:"low",hardware_pct:"32",training_total:"2",days_since_last_training:"56",teacher_attendance_last:"66",teacher_attendance_previous:"66",open_tickets_count:"7",oldest_ticket_age:"36",nps_latest:"4",nps_previous:"6",student_performance_pct:"64",face_change:"yes",days_since_face_change_visit:"13",school_size:"393"},
+  {school_name:"Loyola School Jamshedpur",pending_dues_pct:"78",product_usage:"low",hardware_pct:"33",training_total:"0",days_since_last_training:"170",teacher_attendance_last:"42",teacher_attendance_previous:"41",open_tickets_count:"8",oldest_ticket_age:"89",nps_latest:"3",nps_previous:"2",student_performance_pct:"42",face_change:"yes",days_since_face_change_visit:"28",school_size:"222"},
+  {school_name:"DAV Public School Dhanbad",pending_dues_pct:"25",product_usage:"medium",hardware_pct:"61",training_total:"2",days_since_last_training:"47",teacher_attendance_last:"67",teacher_attendance_previous:"70",open_tickets_count:"2",oldest_ticket_age:"10",nps_latest:"7",nps_previous:"6",student_performance_pct:"64",face_change:"no",days_since_face_change_visit:"0",school_size:"627"},
+  {school_name:"Holy Cross School Bokaro",pending_dues_pct:"12",product_usage:"high",hardware_pct:"80",training_total:"3",days_since_last_training:"22",teacher_attendance_last:"76",teacher_attendance_previous:"85",open_tickets_count:"1",oldest_ticket_age:"8",nps_latest:"7",nps_previous:"7",student_performance_pct:"77",face_change:"no",days_since_face_change_visit:"0",school_size:"848"},
+  {school_name:"Vidya Bharati School Hazaribagh",pending_dues_pct:"11",product_usage:"high",hardware_pct:"85",training_total:"4",days_since_last_training:"35",teacher_attendance_last:"89",teacher_attendance_previous:"79",open_tickets_count:"1",oldest_ticket_age:"4",nps_latest:"7",nps_previous:"9",student_performance_pct:"76",face_change:"no",days_since_face_change_visit:"0",school_size:"675"},
+  {school_name:"St. Xavier\'s School Ranchi",pending_dues_pct:"67",product_usage:"medium",hardware_pct:"42",training_total:"2",days_since_last_training:"64",teacher_attendance_last:"59",teacher_attendance_previous:"71",open_tickets_count:"6",oldest_ticket_age:"25",nps_latest:"4",nps_previous:"4",student_performance_pct:"54",face_change:"no",days_since_face_change_visit:"0",school_size:"281"},
+  {school_name:"Army Public School Namkum",pending_dues_pct:"18",product_usage:"high",hardware_pct:"72",training_total:"4",days_since_last_training:"27",teacher_attendance_last:"89",teacher_attendance_previous:"83",open_tickets_count:"2",oldest_ticket_age:"0",nps_latest:"9",nps_previous:"9",student_performance_pct:"69",face_change:"no",days_since_face_change_visit:"0",school_size:"749"},
+  {school_name:"Little Flower School Doranda",pending_dues_pct:"13",product_usage:"high",hardware_pct:"80",training_total:"3",days_since_last_training:"24",teacher_attendance_last:"88",teacher_attendance_previous:"80",open_tickets_count:"1",oldest_ticket_age:"0",nps_latest:"9",nps_previous:"9",student_performance_pct:"72",face_change:"no",days_since_face_change_visit:"0",school_size:"897"},
+  {school_name:"Bishop Westcott Boys School",pending_dues_pct:"36",product_usage:"medium",hardware_pct:"70",training_total:"3",days_since_last_training:"62",teacher_attendance_last:"71",teacher_attendance_previous:"69",open_tickets_count:"3",oldest_ticket_age:"29",nps_latest:"6",nps_previous:"7",student_performance_pct:"72",face_change:"no",days_since_face_change_visit:"0",school_size:"571"},
+  {school_name:"Carmel School Ranchi",pending_dues_pct:"9",product_usage:"high",hardware_pct:"93",training_total:"4",days_since_last_training:"20",teacher_attendance_last:"85",teacher_attendance_previous:"86",open_tickets_count:"0",oldest_ticket_age:"0",nps_latest:"9",nps_previous:"9",student_performance_pct:"77",face_change:"no",days_since_face_change_visit:"0",school_size:"559"},
+  {school_name:"Don Bosco School Patna",pending_dues_pct:"45",product_usage:"low",hardware_pct:"53",training_total:"2",days_since_last_training:"54",teacher_attendance_last:"72",teacher_attendance_previous:"59",open_tickets_count:"4",oldest_ticket_age:"50",nps_latest:"6",nps_previous:"4",student_performance_pct:"58",face_change:"no",days_since_face_change_visit:"0",school_size:"470"},
+  {school_name:"Notre Dame Academy",pending_dues_pct:"18",product_usage:"high",hardware_pct:"87",training_total:"3",days_since_last_training:"37",teacher_attendance_last:"84",teacher_attendance_previous:"87",open_tickets_count:"2",oldest_ticket_age:"11",nps_latest:"8",nps_previous:"9",student_performance_pct:"75",face_change:"no",days_since_face_change_visit:"0",school_size:"461"},
+  {school_name:"Sacred Heart School Gumla",pending_dues_pct:"61",product_usage:"low",hardware_pct:"48",training_total:"1",days_since_last_training:"87",teacher_attendance_last:"62",teacher_attendance_previous:"55",open_tickets_count:"3",oldest_ticket_age:"23",nps_latest:"4",nps_previous:"4",student_performance_pct:"51",face_change:"yes",days_since_face_change_visit:"20",school_size:"236"},
+  {school_name:"Rajendra Vidyalaya",pending_dues_pct:"41",product_usage:"medium",hardware_pct:"56",training_total:"2",days_since_last_training:"60",teacher_attendance_last:"72",teacher_attendance_previous:"80",open_tickets_count:"4",oldest_ticket_age:"11",nps_latest:"6",nps_previous:"5",student_performance_pct:"70",face_change:"no",days_since_face_change_visit:"0",school_size:"520"},
+  {school_name:"Springdale School Ranchi",pending_dues_pct:"34",product_usage:"low",hardware_pct:"51",training_total:"2",days_since_last_training:"33",teacher_attendance_last:"77",teacher_attendance_previous:"75",open_tickets_count:"1",oldest_ticket_age:"12",nps_latest:"6",nps_previous:"5",student_performance_pct:"68",face_change:"no",days_since_face_change_visit:"0",school_size:"529"},
+  {school_name:"DPS Bokaro Steel City",pending_dues_pct:"71",product_usage:"low",hardware_pct:"29",training_total:"0",days_since_last_training:"89",teacher_attendance_last:"54",teacher_attendance_previous:"65",open_tickets_count:"6",oldest_ticket_age:"43",nps_latest:"4",nps_previous:"4",student_performance_pct:"35",face_change:"yes",days_since_face_change_visit:"45",school_size:"201"},
+  {school_name:"Chinmaya Vidyalaya",pending_dues_pct:"70",product_usage:"low",hardware_pct:"57",training_total:"2",days_since_last_training:"53",teacher_attendance_last:"60",teacher_attendance_previous:"67",open_tickets_count:"3",oldest_ticket_age:"44",nps_latest:"5",nps_previous:"5",student_performance_pct:"59",face_change:"no",days_since_face_change_visit:"0",school_size:"416"},
+  {school_name:"Ryan International School",pending_dues_pct:"22",product_usage:"high",hardware_pct:"85",training_total:"3",days_since_last_training:"21",teacher_attendance_last:"84",teacher_attendance_previous:"81",open_tickets_count:"0",oldest_ticket_age:"1",nps_latest:"9",nps_previous:"8",student_performance_pct:"68",face_change:"no",days_since_face_change_visit:"0",school_size:"425"},
+  {school_name:"Bal Bharati Public School",pending_dues_pct:"49",product_usage:"low",hardware_pct:"55",training_total:"2",days_since_last_training:"62",teacher_attendance_last:"67",teacher_attendance_previous:"70",open_tickets_count:"1",oldest_ticket_age:"24",nps_latest:"6",nps_previous:"7",student_performance_pct:"63",face_change:"yes",days_since_face_change_visit:"17",school_size:"361"},
+  {school_name:"Nirmala Convent School",pending_dues_pct:"9",product_usage:"high",hardware_pct:"91",training_total:"4",days_since_last_training:"23",teacher_attendance_last:"94",teacher_attendance_previous:"85",open_tickets_count:"0",oldest_ticket_age:"0",nps_latest:"10",nps_previous:"8",student_performance_pct:"80",face_change:"no",days_since_face_change_visit:"0",school_size:"1173"},
+  {school_name:"St. Patrick\'s High School",pending_dues_pct:"30",product_usage:"medium",hardware_pct:"56",training_total:"3",days_since_last_training:"45",teacher_attendance_last:"73",teacher_attendance_previous:"77",open_tickets_count:"2",oldest_ticket_age:"26",nps_latest:"7",nps_previous:"6",student_performance_pct:"65",face_change:"yes",days_since_face_change_visit:"7",school_size:"304"},
+  {school_name:"Guru Nanak Public School",pending_dues_pct:"23",product_usage:"medium",hardware_pct:"67",training_total:"2",days_since_last_training:"62",teacher_attendance_last:"73",teacher_attendance_previous:"69",open_tickets_count:"3",oldest_ticket_age:"7",nps_latest:"6",nps_previous:"6",student_performance_pct:"64",face_change:"yes",days_since_face_change_visit:"10",school_size:"524"},
+  {school_name:"Saraswati Shishu Mandir",pending_dues_pct:"14",product_usage:"high",hardware_pct:"90",training_total:"3",days_since_last_training:"36",teacher_attendance_last:"84",teacher_attendance_previous:"78",open_tickets_count:"0",oldest_ticket_age:"8",nps_latest:"7",nps_previous:"7",student_performance_pct:"76",face_change:"no",days_since_face_change_visit:"0",school_size:"479"},
+  {school_name:"Oxford School Jamshedpur",pending_dues_pct:"53",product_usage:"medium",hardware_pct:"40",training_total:"1",days_since_last_training:"93",teacher_attendance_last:"75",teacher_attendance_previous:"63",open_tickets_count:"7",oldest_ticket_age:"51",nps_latest:"5",nps_previous:"4",student_performance_pct:"52",face_change:"no",days_since_face_change_visit:"0",school_size:"416"},
+  {school_name:"Indus Public School",pending_dues_pct:"6",product_usage:"high",hardware_pct:"80",training_total:"3",days_since_last_training:"35",teacher_attendance_last:"83",teacher_attendance_previous:"80",open_tickets_count:"2",oldest_ticket_age:"14",nps_latest:"9",nps_previous:"9",student_performance_pct:"74",face_change:"no",days_since_face_change_visit:"0",school_size:"687"},
+  {school_name:"Jawahar Vidya Mandir",pending_dues_pct:"64",product_usage:"none",hardware_pct:"32",training_total:"0",days_since_last_training:"127",teacher_attendance_last:"58",teacher_attendance_previous:"57",open_tickets_count:"7",oldest_ticket_age:"67",nps_latest:"2",nps_previous:"2",student_performance_pct:"44",face_change:"yes",days_since_face_change_visit:"44",school_size:"100"},
+  {school_name:"Montfort School Ranchi",pending_dues_pct:"11",product_usage:"high",hardware_pct:"77",training_total:"3",days_since_last_training:"26",teacher_attendance_last:"88",teacher_attendance_previous:"79",open_tickets_count:"0",oldest_ticket_age:"5",nps_latest:"7",nps_previous:"8",student_performance_pct:"68",face_change:"no",days_since_face_change_visit:"0",school_size:"491"},
+  {school_name:"St. John\'s School Ranchi",pending_dues_pct:"15",product_usage:"medium",hardware_pct:"77",training_total:"4",days_since_last_training:"20",teacher_attendance_last:"78",teacher_attendance_previous:"87",open_tickets_count:"0",oldest_ticket_age:"15",nps_latest:"7",nps_previous:"7",student_performance_pct:"75",face_change:"no",days_since_face_change_visit:"0",school_size:"579"},
+  {school_name:"Goodwill School Ramgarh",pending_dues_pct:"54",product_usage:"low",hardware_pct:"51",training_total:"1",days_since_last_training:"75",teacher_attendance_last:"65",teacher_attendance_previous:"63",open_tickets_count:"3",oldest_ticket_age:"37",nps_latest:"5",nps_previous:"6",student_performance_pct:"62",face_change:"yes",days_since_face_change_visit:"20",school_size:"214"},
+  {school_name:"Presidency School Bokaro",pending_dues_pct:"76",product_usage:"none",hardware_pct:"33",training_total:"1",days_since_last_training:"84",teacher_attendance_last:"43",teacher_attendance_previous:"59",open_tickets_count:"11",oldest_ticket_age:"62",nps_latest:"4",nps_previous:"3",student_performance_pct:"48",face_change:"no",days_since_face_change_visit:"32",school_size:"139"},
+  {school_name:"Kairali School Hazaribagh",pending_dues_pct:"26",product_usage:"medium",hardware_pct:"51",training_total:"3",days_since_last_training:"30",teacher_attendance_last:"71",teacher_attendance_previous:"76",open_tickets_count:"4",oldest_ticket_age:"7",nps_latest:"7",nps_previous:"7",student_performance_pct:"65",face_change:"yes",days_since_face_change_visit:"8",school_size:"668"},
+  {school_name:"Bhartiya Vidya Bhavan",pending_dues_pct:"8",product_usage:"high",hardware_pct:"92",training_total:"4",days_since_last_training:"18",teacher_attendance_last:"90",teacher_attendance_previous:"91",open_tickets_count:"0",oldest_ticket_age:"0",nps_latest:"10",nps_previous:"9",student_performance_pct:"82",face_change:"no",days_since_face_change_visit:"0",school_size:"630"},
+  {school_name:"Modern School Dhanbad",pending_dues_pct:"64",product_usage:"medium",hardware_pct:"53",training_total:"1",days_since_last_training:"89",teacher_attendance_last:"73",teacher_attendance_previous:"64",open_tickets_count:"6",oldest_ticket_age:"55",nps_latest:"4",nps_previous:"5",student_performance_pct:"59",face_change:"no",days_since_face_change_visit:"0",school_size:"307"},
+  {school_name:"Sunshine Academy Deoghar",pending_dues_pct:"39",product_usage:"low",hardware_pct:"60",training_total:"3",days_since_last_training:"58",teacher_attendance_last:"79",teacher_attendance_previous:"71",open_tickets_count:"4",oldest_ticket_age:"30",nps_latest:"6",nps_previous:"7",student_performance_pct:"61",face_change:"yes",days_since_face_change_visit:"14",school_size:"563"},
+  {school_name:"Prerna School Giridih",pending_dues_pct:"24",product_usage:"medium",hardware_pct:"72",training_total:"3",days_since_last_training:"36",teacher_attendance_last:"84",teacher_attendance_previous:"82",open_tickets_count:"0",oldest_ticket_age:"4",nps_latest:"7",nps_previous:"7",student_performance_pct:"71",face_change:"no",days_since_face_change_visit:"0",school_size:"643"},
+  {school_name:"Lakeside School Lohardaga",pending_dues_pct:"34",product_usage:"medium",hardware_pct:"70",training_total:"2",days_since_last_training:"54",teacher_attendance_last:"80",teacher_attendance_previous:"77",open_tickets_count:"2",oldest_ticket_age:"9",nps_latest:"6",nps_previous:"5",student_performance_pct:"72",face_change:"no",days_since_face_change_visit:"0",school_size:"517"},
+  {school_name:"Green Valley School Chaibasa",pending_dues_pct:"73",product_usage:"none",hardware_pct:"31",training_total:"1",days_since_last_training:"57",teacher_attendance_last:"69",teacher_attendance_previous:"59",open_tickets_count:"6",oldest_ticket_age:"53",nps_latest:"6",nps_previous:"6",student_performance_pct:"60",face_change:"no",days_since_face_change_visit:"0",school_size:"426"},
+  {school_name:"Pioneer Academy Dumka",pending_dues_pct:"48",product_usage:"low",hardware_pct:"63",training_total:"3",days_since_last_training:"40",teacher_attendance_last:"80",teacher_attendance_previous:"79",open_tickets_count:"3",oldest_ticket_age:"29",nps_latest:"6",nps_previous:"7",student_performance_pct:"64",face_change:"yes",days_since_face_change_visit:"20",school_size:"620"}
+];
+
+const API_ENDPOINT = (window.location.hostname === 'localhost' || window.location.protocol === 'file:')
+  ? 'http://localhost:3131/v1/messages'
+  : '/api/claude';
+
+const WEIGHTS = {pending_dues:0.35,product_usage:0.30,hardware:0.10,training:0.10,open_tickets:0.05,nps:0.05,student_performance:0.03,teacher_attendance:0.02,face_change:0.00};
+const METRIC_LABELS = {pending_dues:'Pending Dues',product_usage:'Product Usage',hardware:'Hardware Setup',training:'Training',open_tickets:'Open Tickets',nps:'NPS Score',student_performance:'Student Performance',teacher_attendance:'Teacher Attendance'};
+
+function normalize(v,iMin,iMax,oMin,oMax){if(iMax===iMin)return oMin;return Math.round(oMin+((v-iMin)/(iMax-iMin))*(oMax-oMin));}
+
+function scoreMetrics(d){
+  const s={};
+  const dues=parseFloat(d.pending_dues_pct)||0;
+  s.pending_dues=dues<=25?0:dues<=50?normalize(dues,25,50,0,40):dues<=75?normalize(dues,50,75,40,80):normalize(dues,75,100,80,100);
+  const um={high:0,medium:30,low:70,none:100};
+  s.product_usage=um[d.product_usage]!==undefined?um[d.product_usage]:50;
+  const hw=parseFloat(d.hardware_pct)||0;
+  s.hardware=hw>=75?0:hw>=50?normalize(hw,75,50,0,40):hw>=25?normalize(hw,50,25,40,80):normalize(hw,25,0,80,100);
+  const ds=parseInt(d.days_since_last_training),tt=parseInt(d.training_total)||0;
+  s.training=tt===0?100:ds<=45?normalize(ds,0,45,0,30):ds<=90?normalize(ds,45,90,30,75):normalize(ds,90,180,75,100);
+  const tk=parseInt(d.open_tickets_count)||0;
+  s.open_tickets=tk===0?0:tk===1?25:tk<=3?50:tk<=9?normalize(tk,3,9,50,85):100;
+  const nps=parseFloat(d.nps_latest)||5;
+  s.nps=nps>=8?0:nps>=7?15:nps>=6?30:nps>=5?50:nps>=3?75:100;
+  const pf=parseFloat(d.student_performance_pct)||60;
+  s.student_performance=pf>=70?0:pf>=50?normalize(pf,70,50,0,70):normalize(pf,50,30,70,100);
+  const at=parseFloat(d.teacher_attendance_last)||75;
+  s.teacher_attendance=at>=75?0:at>=50?normalize(at,75,50,0,60):normalize(at,50,0,60,100);
+  s.face_change=0;
+  return s;
+}
+
+function calculateRiskScore(d){const sc=scoreMetrics(d);return Math.min(100,Math.max(0,Math.round(Object.entries(WEIGHTS).reduce((t,[k,w])=>t+(sc[k]||0)*w,0))));}
+function getRiskTier(score){return score>=65?'Red':score>=35?'Amber':'Green';}
+function colorFor(s){return s>=65?'#e74c3c':s>=35?'#f39c12':'#27ae60';}
+
+function evaluateRedFlags(d){
+  const f=[];
+  if(parseFloat(d.pending_dues_pct)>=75)f.push({metric:'Pending Dues',reason:d.pending_dues_pct+'% dues pending'});
+  if(d.product_usage==='none')f.push({metric:'Product Usage',reason:'Zero product usage'});
+  if(parseFloat(d.hardware_pct)<25)f.push({metric:'Hardware',reason:'Only '+d.hardware_pct+'% classrooms equipped'});
+  if(parseInt(d.training_total)===0)f.push({metric:'Training',reason:'No training ever conducted'});
+  else if(parseInt(d.days_since_last_training)>=90)f.push({metric:'Training',reason:'No training in '+d.days_since_last_training+' days'});
+  if(parseInt(d.oldest_ticket_age)>45)f.push({metric:'Open Tickets',reason:'Ticket open '+d.oldest_ticket_age+' days'});
+  if(parseInt(d.open_tickets_count)>=10)f.push({metric:'Open Tickets',reason:d.open_tickets_count+' open tickets'});
+  if(parseFloat(d.nps_latest)<5&&parseFloat(d.nps_previous)<5)f.push({metric:'NPS',reason:'Two consecutive NPS below 5'});
+  if(parseFloat(d.student_performance_pct)<50)f.push({metric:'Student Performance',reason:'Avg marks '+d.student_performance_pct+'%'});
+  if(parseFloat(d.teacher_attendance_last)<75&&parseFloat(d.teacher_attendance_previous)<75)f.push({metric:'Teacher Attendance',reason:'Two consecutive trainings below 75%'});
+  if(d.face_change==='yes'&&parseInt(d.days_since_face_change_visit)>15)f.push({metric:'Face Change',reason:'No visit '+d.days_since_face_change_visit+' days after rep change'});
+  return f;
+}
+
+// TAB SWITCHING
+function switchTab(tab){
+  ['single','csv','sheet','guide'].forEach(t=>{
+    document.getElementById('content-'+t).style.display=tab===t?'block':'none';
+    document.getElementById('tab-'+t).classList.toggle('active',tab===t);
+  });
+}
+
+// DEMO DATA
+function loadDemoData(){
+  const demo={pending_dues_pct:'65',product_usage:'low',hardware_pct:'45',training_total:'1',days_since_last_training:'95',teacher_attendance_last:'60',teacher_attendance_previous:'65',open_tickets_count:'5',oldest_ticket_age:'50',nps_latest:'4',nps_previous:'3',student_performance_pct:'55',face_change:'yes',days_since_face_change_visit:'18',school_size:'420'};
+  Object.entries(demo).forEach(([id,val])=>{const el=document.getElementById(id);if(el)el.value=val;});
+  document.querySelector('.form-card').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// SINGLE ANALYSIS
+async function runSingleAnalysis(){
+  const fields=['pending_dues_pct','product_usage','hardware_pct','training_total','days_since_last_training','teacher_attendance_last','teacher_attendance_previous','open_tickets_count','oldest_ticket_age','nps_latest','nps_previous','student_performance_pct','face_change','days_since_face_change_visit','school_size'];
+  const d={};
+  fields.forEach(id=>{d[id]=document.getElementById(id).value;});
+  const score=calculateRiskScore(d),flags=evaluateRedFlags(d),tier=flags.length>0?'Red':getRiskTier(score),ms=scoreMetrics(d);
+  document.getElementById('single-empty').style.display='none';
+  document.getElementById('analyse-btn').disabled=true;
+  renderRiskCard('single',score,tier,flags,ms);
+  document.getElementById('single-narrative').classList.add('visible');
+  document.getElementById('single-narrative-text').textContent='Generating AI narrative...';
+  document.getElementById('single-reason').textContent=flags.length>0?flags[0].reason:'See narrative below';
+  document.getElementById('single-action').textContent='See AI narrative below';
+  try{document.getElementById('single-narrative-text').textContent=await fetchNarrative(d,score,tier,flags);}
+  catch(e){document.getElementById('single-narrative-text').textContent='Could not generate narrative: '+e.message;}
+  document.getElementById('analyse-btn').disabled=false;
+}
+
+function renderRiskCard(prefix,score,tier,flags,ms){
+  document.getElementById(prefix+'-badge').className='risk-badge '+tier;
+  document.getElementById(prefix+'-tier-text').textContent=tier+' Risk';
+  document.getElementById(prefix+'-score').textContent=score;
+  document.getElementById(prefix+'-risk-card').className='risk-card visible '+tier;
+  document.getElementById(prefix+'-flag-count').textContent=flags.length>0?flags.length+' red flag(s) &#8212; tier forced to Red':'No red flags triggered';
+  const fs=document.getElementById(prefix+'-flags-section');
+  if(flags.length>0){fs.classList.add('visible');document.getElementById(prefix+'-flags-list').innerHTML=flags.map(f=>'<div class="flag-item"><div class="flag-metric">'+f.metric+'</div><div class="flag-reason">'+f.reason+'</div></div>').join('');}
+  else fs.classList.remove('visible');
+  document.getElementById(prefix+'-breakdown').classList.add('visible');
+  document.getElementById(prefix+'-breakdown-bars').innerHTML=Object.entries(WEIGHTS).filter(([k,w])=>w>0).sort((a,b)=>(ms[b[0]]*b[1])-(ms[a[0]]*a[1])).map(([k,w])=>{const sc=ms[k]||0;return '<div class="metric-bar-row"><div class="metric-bar-label">'+METRIC_LABELS[k]+'</div><div class="metric-bar-track"><div class="metric-bar-fill" style="width:'+sc+'%;background:'+colorFor(sc)+'"></div></div><div class="metric-bar-score">'+sc+'</div><div class="metric-bar-weight">'+Math.round(w*100)+'%</div></div>';}).join('');
+}
+
+async function fetchNarrative(d,score,tier,flags){
+  const flagSummary=flags.length>0?'RED FLAGS: '+flags.map(f=>f.metric+' - '+f.reason).join('; '):'No red flags.';
+  const resp=await fetch(API_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:280,system:'You are a senior retention analyst for an EdTech K-12 company. Write a 3-sentence retention narrative: (1) what the data says right now, (2) the most likely root cause, (3) the single most important action this week. Be specific. Use the actual numbers.',messages:[{role:'user',content:'Risk Score: '+score+'/100. Tier: '+tier+'. '+flagSummary+' Data: pending dues '+d.pending_dues_pct+'%, usage '+d.product_usage+', hardware '+d.hardware_pct+'%, trainings '+d.training_total+'/4, last training '+d.days_since_last_training+' days ago, teacher attendance '+d.teacher_attendance_last+'%, open tickets '+d.open_tickets_count+' (oldest '+d.oldest_ticket_age+' days), NPS '+d.nps_latest+' (prev '+d.nps_previous+'), student performance '+d.student_performance_pct+'%, face change: '+d.face_change+', school size: '+d.school_size+' students.'}]})});
+  const raw=await resp.json();
+  return raw.content[0].text;
+}
+
+// CSV BATCH
+let allSchools=[],currentFilter='all',currentSort='score_desc',selectedRow=null;
+function handleDrop(e){e.preventDefault();document.getElementById('upload-area').classList.remove('dragover');if(e.dataTransfer.files[0])processCSVFile(e.dataTransfer.files[0]);}
+function handleCSVUpload(e){if(e.target.files[0])processCSVFile(e.target.files[0]);}
+function processCSVFile(file){const reader=new FileReader();reader.onload=e=>parseAndScoreCSV(e.target.result,false);reader.readAsText(file);}
+
+function parseAndScoreCSV(text,isSheet){
+  const rows=text.trim().split('\n');
+  const headers=rows[0].split(',').map(h=>h.replace(/"/g,'').trim());
+  const schools=rows.slice(1).map(row=>{
+    const vals=row.match(/("[^"]*"|[^,]+)(?=,|$)/g)||row.split(',');
+    const obj={};headers.forEach((h,i)=>{obj[h]=(vals[i]||'').replace(/"/g,'').trim();});return obj;
+  }).filter(s=>s.school_name&&s.school_name.length>0);
+  return schools;
+}
+
+function scoreAllSchools(schools,prefix){
+  const pb=document.getElementById((prefix||'')+'processing-bar')||document.getElementById('processing-bar');
+  const pf=document.getElementById((prefix||'')+'progress-fill')||document.getElementById('progress-fill');
+  const pt=document.getElementById((prefix||'')+'processing-text')||document.getElementById('processing-text');
+  if(pb)pb.classList.add('visible');
+  const scored=schools.map((s,i)=>{
+    const score=calculateRiskScore(s),flags=evaluateRedFlags(s),tier=flags.length>0?'Red':getRiskTier(score);
+    if(pf)pf.style.width=Math.round(((i+1)/schools.length)*100)+'%';
+    if(pt)pt.textContent='Scoring '+(i+1)+' of '+schools.length+' schools...';
+    return{...s,score,flags,tier};
+  });
+  if(pb)pb.classList.remove('visible');
+  return scored;
+}
+
+function setFilter(f){currentFilter=f;['all','red','amber','green'].forEach(x=>{const b=document.getElementById('filter-'+x);if(b)b.classList.remove('active');});const ab=document.getElementById('filter-'+f.toLowerCase());if(ab)ab.classList.add('active');renderTable();}
+function setSortAndRender(s){currentSort=s;renderTable();}
+
+function renderTable(){
+  let schools=currentFilter==='all'?[...allSchools]:allSchools.filter(s=>s.tier===currentFilter);
+  schools.sort((a,b)=>currentSort==='score_desc'?b.score-a.score:currentSort==='score_asc'?a.score-b.score:currentSort==='name_asc'?a.school_name.localeCompare(b.school_name):b.flags.length-a.flags.length);
+  const red=allSchools.filter(s=>s.tier==='Red').length,amber=allSchools.filter(s=>s.tier==='Amber').length,green=allSchools.filter(s=>s.tier==='Green').length;
+  document.getElementById('results-count').textContent=schools.length+' schools &#8212; '+red+' Red, '+amber+' Amber, '+green+' Green';
+  const um={high:'High',medium:'Medium',low:'Low',none:'None'};
+  document.getElementById('schools-tbody').innerHTML=schools.map(s=>{const idx=allSchools.indexOf(s);return '<tr onclick="openDeepDive('+idx+',this)"><td><div class="td-school">'+s.school_name+'</div></td><td><span class="score-cell '+s.tier+'">'+s.score+'</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:'+s.score+'%;background:'+colorFor(s.score)+'"></div></div></td><td><span class="tier-pill '+s.tier+'">&#9679; '+s.tier+'</span></td><td>'+(s.flags.length>0?'<span class="flag-count">'+s.flags.length+' flag'+(s.flags.length>1?'s':'')+'</span>':'<span style="color:#aaa;font-size:12px">&#8212;</span>')+'</td><td>'+s.pending_dues_pct+'%</td><td>'+(um[s.product_usage]||s.product_usage)+'</td><td>'+s.hardware_pct+'%</td><td>'+s.training_total+'/4</td><td>'+s.school_size+'</td></tr>';}).join('');
+}
+
+async function openDeepDive(idx,rowEl){
+  if(selectedRow)selectedRow.classList.remove('selected');rowEl.classList.add('selected');selectedRow=rowEl;
+  const s=allSchools[idx];
+  buildDeepDive('deep-dive','dd',s);
+  document.getElementById('deep-dive').classList.add('visible');
+  document.getElementById('deep-dive').scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('dd-narrative').textContent='Generating AI narrative for '+s.school_name+'...';
+  try{document.getElementById('dd-narrative').textContent=await fetchNarrative(s,s.score,s.tier,s.flags);}
+  catch(e){document.getElementById('dd-narrative').textContent='Could not generate narrative: '+e.message;}
+}
+function closeDeepDive(){document.getElementById('deep-dive').classList.remove('visible');if(selectedRow){selectedRow.classList.remove('selected');selectedRow=null;}}
+
+function buildDeepDive(divId,prefix,s){
+  document.getElementById(divId+'-header')||document.getElementById('sheet-dd-title')||true;
+  const titleEl=document.getElementById(prefix+'-title')||document.getElementById('sheet-dd-title');
+  if(titleEl)titleEl.textContent=s.school_name+' &#8212; Deep Dive';
+  const mEl=document.getElementById(prefix+'-metrics')||document.getElementById('sheet-dd-metrics');
+  if(mEl)mEl.innerHTML=[{label:'Risk Score',value:s.score+' / 100'},{label:'Risk Tier',value:s.tier},{label:'Pending Dues',value:s.pending_dues_pct+'%'},{label:'Product Usage',value:s.product_usage},{label:'Hardware',value:s.hardware_pct+'%'},{label:'Trainings Done',value:s.training_total+' / 4'},{label:'Last Training',value:s.days_since_last_training+' days ago'},{label:'Open Tickets',value:s.open_tickets_count},{label:'NPS',value:s.nps_latest+' / 10'},{label:'Student Perf',value:s.student_performance_pct+'%'},{label:'School Size',value:s.school_size+' students'},{label:'Face Change',value:s.face_change}].map(m=>'<div class="dd-metric"><div class="dd-metric-label">'+m.label+'</div><div class="dd-metric-value">'+m.value+'</div></div>').join('');
+  const fEl=document.getElementById(prefix+'-flags')||document.getElementById('sheet-dd-flags');
+  if(fEl)fEl.innerHTML=s.flags.length>0?'<div class="flags-title" style="margin-bottom:8px">&#9876; Red Flags</div>'+s.flags.map(f=>'<div class="flag-item"><div class="flag-metric">'+f.metric+'</div><div class="flag-reason">'+f.reason+'</div></div>').join(''):'';
+}
+
+// SHEET SYNC
+let sheetSchools=[],sheetFilter='all',sheetSort='score_desc',sheetSelectedRow=null;
+
+function extractSheetId(url){const m=url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);return m?m[1]:null;}
+
+async function analyseFromSheet(){
+  const url=document.getElementById('sheet-url').value.trim();
+  const msgEl=document.getElementById('sheet-msg');
+  msgEl.className='sheet-msg';msgEl.classList.remove('visible');
+  if(!url){msgEl.className='sheet-msg error';msgEl.textContent='Please paste a Google Sheet URL.';msgEl.classList.add('visible');return;}
+  const sheetId=extractSheetId(url);
+  if(!sheetId){msgEl.className='sheet-msg error';msgEl.textContent='Could not find a Sheet ID in that URL. Make sure you paste the full Google Sheets URL.';msgEl.classList.add('visible');return;}
+  document.getElementById('sheet-btn').disabled=true;
+  document.getElementById('sheet-processing').classList.add('visible');
+  document.getElementById('sheet-results').style.display='none';
+  document.getElementById('sheet-progress-fill').style.width='10%';
+  document.getElementById('sheet-processing-text').textContent='Fetching sheet data...';
+  try{
+    const csvUrl='https://docs.google.com/spreadsheets/d/'+sheetId+'/export?format=csv&gid=0';
+    const resp=await fetch(csvUrl);
+    if(!resp.ok)throw new Error('Could not access the sheet. Make sure sharing is set to "Anyone with the link can view".');
+    const text=await resp.text();
+    document.getElementById('sheet-progress-fill').style.width='40%';
+    document.getElementById('sheet-processing-text').textContent='Scoring schools...';
+    const schools=parseAndScoreCSV(text,true);
+    if(schools.length===0)throw new Error('No school data found. Check column headers match the template.');
+    sheetSchools=scoreAllSchools(schools,'sheet-');
+    document.getElementById('sheet-processing').classList.remove('visible');
+    document.getElementById('sheet-results').style.display='block';
+    renderSheetTable();
+  }catch(e){
+    document.getElementById('sheet-processing').classList.remove('visible');
+    msgEl.className='sheet-msg error';msgEl.textContent=e.message;msgEl.classList.add('visible');
+  }
+  document.getElementById('sheet-btn').disabled=false;
+}
+
+function setSheetFilter(f){sheetFilter=f;['all','red','amber','green'].forEach(x=>{const b=document.getElementById('sf-'+x);if(b)b.classList.remove('active');});const ab=document.getElementById('sf-'+f.toLowerCase());if(ab)ab.classList.add('active');renderSheetTable();}
+function setSheetSort(s){sheetSort=s;renderSheetTable();}
+
+function renderSheetTable(){
+  let schools=sheetFilter==='all'?[...sheetSchools]:sheetSchools.filter(s=>s.tier===sheetFilter);
+  schools.sort((a,b)=>sheetSort==='score_desc'?b.score-a.score:sheetSort==='score_asc'?a.score-b.score:sheetSort==='name_asc'?a.school_name.localeCompare(b.school_name):b.flags.length-a.flags.length);
+  const red=sheetSchools.filter(s=>s.tier==='Red').length,amber=sheetSchools.filter(s=>s.tier==='Amber').length,green=sheetSchools.filter(s=>s.tier==='Green').length;
+  document.getElementById('sheet-results-count').textContent=schools.length+' schools &#8212; '+red+' Red, '+amber+' Amber, '+green+' Green';
+  const um={high:'High',medium:'Medium',low:'Low',none:'None'};
+  document.getElementById('sheet-tbody').innerHTML=schools.map(s=>{const idx=sheetSchools.indexOf(s);return '<tr onclick="openSheetDeepDive('+idx+',this)"><td><div class="td-school">'+s.school_name+'</div></td><td><span class="score-cell '+s.tier+'">'+s.score+'</span><div class="mini-bar-track"><div class="mini-bar-fill" style="width:'+s.score+'%;background:'+colorFor(s.score)+'"></div></div></td><td><span class="tier-pill '+s.tier+'">&#9679; '+s.tier+'</span></td><td>'+(s.flags.length>0?'<span class="flag-count">'+s.flags.length+' flag'+(s.flags.length>1?'s':'')+'</span>':'<span style="color:#aaa;font-size:12px">&#8212;</span>')+'</td><td>'+s.pending_dues_pct+'%</td><td>'+(um[s.product_usage]||s.product_usage)+'</td><td>'+s.hardware_pct+'%</td><td>'+s.training_total+'/4</td><td>'+s.school_size+'</td></tr>';}).join('');
+}
+
+async function openSheetDeepDive(idx,rowEl){
+  if(sheetSelectedRow)sheetSelectedRow.classList.remove('selected');rowEl.classList.add('selected');sheetSelectedRow=rowEl;
+  const s=sheetSchools[idx];
+  document.getElementById('sheet-dd-title').textContent=s.school_name+' &#8212; Deep Dive';
+  document.getElementById('sheet-dd-metrics').innerHTML=[{label:'Risk Score',value:s.score+' / 100'},{label:'Risk Tier',value:s.tier},{label:'Pending Dues',value:s.pending_dues_pct+'%'},{label:'Product Usage',value:s.product_usage},{label:'Hardware',value:s.hardware_pct+'%'},{label:'Trainings Done',value:s.training_total+' / 4'},{label:'Last Training',value:s.days_since_last_training+' days ago'},{label:'Open Tickets',value:s.open_tickets_count},{label:'NPS',value:s.nps_latest+' / 10'},{label:'Student Perf',value:s.student_performance_pct+'%'},{label:'School Size',value:s.school_size+' students'},{label:'Face Change',value:s.face_change}].map(m=>'<div class="dd-metric"><div class="dd-metric-label">'+m.label+'</div><div class="dd-metric-value">'+m.value+'</div></div>').join('');
+  document.getElementById('sheet-dd-flags').innerHTML=s.flags.length>0?'<div class="flags-title" style="margin-bottom:8px">&#9876; Red Flags</div>'+s.flags.map(f=>'<div class="flag-item"><div class="flag-metric">'+f.metric+'</div><div class="flag-reason">'+f.reason+'</div></div>').join(''):'';
+  document.getElementById('sheet-deep-dive').classList.add('visible');
+  document.getElementById('sheet-deep-dive').scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('sheet-dd-narrative').textContent='Generating AI narrative for '+s.school_name+'...';
+  try{document.getElementById('sheet-dd-narrative').textContent=await fetchNarrative(s,s.score,s.tier,s.flags);}
+  catch(e){document.getElementById('sheet-dd-narrative').textContent='Could not generate narrative: '+e.message;}
+}
+function closeSheetDeepDive(){document.getElementById('sheet-deep-dive').classList.remove('visible');if(sheetSelectedRow){sheetSelectedRow.classList.remove('selected');sheetSelectedRow=null;}}
+
+// SAMPLE CSV DOWNLOAD (40 schools)
+function downloadSample(){
+  const rows=SAMPLE_SCHOOLS.map(s=>'"'+s.school_name.replace(/"/g,'""')+'",'+s.pending_dues_pct+','+s.product_usage+','+s.hardware_pct+','+s.training_total+','+s.days_since_last_training+','+s.teacher_attendance_last+','+s.teacher_attendance_previous+','+s.open_tickets_count+','+s.oldest_ticket_age+','+s.nps_latest+','+s.nps_previous+','+s.student_performance_pct+','+s.face_change+','+s.days_since_face_change_visit+','+s.school_size);
+  const csv='school_name,pending_dues_pct,product_usage,hardware_pct,training_total,days_since_last_training,teacher_attendance_last,teacher_attendance_previous,open_tickets_count,oldest_ticket_age,nps_latest,nps_previous,student_performance_pct,face_change,days_since_face_change_visit,school_size\n'+rows.join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='sample_schools_40.csv';a.click();
+}
+</script>
 </body>
 </html>
