@@ -764,7 +764,7 @@ async function runSingleAnalysis(){
   document.getElementById('single-narrative-text').textContent='Generating AI narrative...';
   document.getElementById('single-reason').textContent=flags.length>0?flags[0].reason:'See narrative below';
   document.getElementById('single-action').textContent='See AI narrative below';
-  try{document.getElementById('single-narrative-text').textContent=await fetchNarrative(d,score,tier,flags);}
+  try{document.getElementById('single-narrative-text').innerHTML=formatNarrative(await fetchNarrative(d,score,tier,flags));}
   catch(e){document.getElementById('single-narrative-text').textContent='Could not generate narrative: '+e.message;}
   document.getElementById('analyse-btn').disabled=false;
 }
@@ -784,7 +784,7 @@ function renderRiskCard(prefix,score,tier,flags,ms){
 
 async function fetchNarrative(d,score,tier,flags){
   const flagSummary=flags.length>0?'RED FLAGS: '+flags.map(f=>f.metric+' - '+f.reason).join('; '):'No red flags.';
-  const resp=await fetch(API_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:280,system:'You are a senior retention analyst for an EdTech K-12 company. Write a 3-sentence retention narrative: (1) what the data says right now, (2) the most likely root cause, (3) the single most important action this week. Be specific. Use the actual numbers.',messages:[{role:'user',content:'Risk Score: '+score+'/100. Tier: '+tier+'. '+flagSummary+' Data: pending dues '+d.pending_dues_pct+'%, usage '+d.product_usage+', hardware '+d.hardware_pct+'%, trainings '+d.training_total+'/4, last training '+d.days_since_last_training+' days ago, teacher attendance '+d.teacher_attendance_last+'%, open tickets '+d.open_tickets_count+' (oldest '+d.oldest_ticket_age+' days), NPS '+d.nps_latest+' (prev '+d.nps_previous+'), student performance '+d.student_performance_pct+'%, face change: '+d.face_change+', school size: '+d.school_size+' students.'}]})});
+  const resp=await fetch(API_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:280,system:'You are a senior retention analyst for an EdTech K-12 company. Write a retention narrative in exactly 3 short paragraphs, no headers, no markdown, no bullet points, plain text only. Paragraph 1: what the data says right now. Paragraph 2: the most likely root cause. Paragraph 3: the single most important action this week. Be specific. Use the actual numbers.',messages:[{role:'user',content:'Risk Score: '+score+'/100. Tier: '+tier+'. '+flagSummary+' Data: pending dues '+d.pending_dues_pct+'%, usage '+d.product_usage+', hardware '+d.hardware_pct+'%, trainings '+d.training_total+'/4, last training '+d.days_since_last_training+' days ago, teacher attendance '+d.teacher_attendance_last+'%, open tickets '+d.open_tickets_count+' (oldest '+d.oldest_ticket_age+' days), NPS '+d.nps_latest+' (prev '+d.nps_previous+'), student performance '+d.student_performance_pct+'%, face change: '+d.face_change+', school size: '+d.school_size+' students.'}]})});
   const raw=await resp.json();
   return raw.content[0].text;
 }
@@ -852,7 +852,7 @@ async function openDeepDive(idx,rowEl){
   document.getElementById('deep-dive').classList.add('visible');
   document.getElementById('deep-dive').scrollIntoView({behavior:'smooth',block:'start'});
   document.getElementById('dd-narrative').textContent='Generating AI narrative for '+s.school_name+'...';
-  try{document.getElementById('dd-narrative').textContent=await fetchNarrative(s,s.score,s.tier,s.flags);}
+  try{document.getElementById('dd-narrative').innerHTML=formatNarrative(await fetchNarrative(s,s.score,s.tier,s.flags));}
   catch(e){document.getElementById('dd-narrative').textContent='Could not generate narrative: '+e.message;}
 }
 function closeDeepDive(){document.getElementById('deep-dive').classList.remove('visible');if(selectedRow){selectedRow.classList.remove('selected');selectedRow=null;}}
@@ -932,7 +932,7 @@ async function openSheetDeepDive(idx,rowEl){
   document.getElementById('sheet-deep-dive').classList.add('visible');
   document.getElementById('sheet-deep-dive').scrollIntoView({behavior:'smooth',block:'start'});
   document.getElementById('sheet-dd-narrative').textContent='Generating AI narrative for '+s.school_name+'...';
-  try{document.getElementById('sheet-dd-narrative').textContent=await fetchNarrative(s,s.score,s.tier,s.flags);}
+  try{document.getElementById('sheet-dd-narrative').innerHTML=formatNarrative(await fetchNarrative(s,s.score,s.tier,s.flags));}
   catch(e){document.getElementById('sheet-dd-narrative').textContent='Could not generate narrative: '+e.message;}
 }
 function closeSheetDeepDive(){document.getElementById('sheet-deep-dive').classList.remove('visible');if(sheetSelectedRow){sheetSelectedRow.classList.remove('selected');sheetSelectedRow=null;}}
@@ -944,6 +944,33 @@ function downloadSample(){
   const blob=new Blob([csv],{type:'text/csv'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='sample_schools_40.csv';a.click();
 }
+
+// ── FORMAT AI NARRATIVE ───────────────────────────────────────
+function formatNarrative(text) {
+  if (!text) return '';
+  // Remove markdown heading lines like ## Retention Narrative: [School Name]
+  text = text.replace(/^##.*\n?/gm, '');
+  // Convert **bold** to <strong>
+  text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  // Convert *italic* to <em>
+  text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+  // Split into sentences/paragraphs for readability
+  // Look for the 3 key sections and wrap them
+  text = text.trim();
+  // Split on double newline or on the pattern of sentence ending + capital letter start
+  const parts = text.split(/\n\n+/);
+  if (parts.length > 1) {
+    return parts.map(p => '<p style="margin-bottom:10px;line-height:1.7">' + p.trim() + '</p>').join('');
+  }
+  // If single block, try to split on the bold section headers
+  if (text.includes('<strong>')) {
+    // Wrap each **Section:** ... as its own paragraph
+    const sections = text.split(/(?=<strong>)/);
+    return sections.map(s => s.trim() ? '<p style="margin-bottom:10px;line-height:1.7">' + s.trim() + '</p>' : '').join('');
+  }
+  return '<p style="line-height:1.7">' + text + '</p>';
+}
+
 </script>
 </body>
 </html>
